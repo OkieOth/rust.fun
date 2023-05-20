@@ -1,35 +1,27 @@
-use std::env;
-use std::process;
+
+use clap::Parser;
 
 
-fn print_usage_and_exit(program_name: &str) {
-    println!("Usage: {} {{NUMBER_OF_DIGITS}}", program_name);
-    println!();
-    println!("The program prints the permutations for a given number of digits.");
-    println!("e.g. `{} 4` prints all possible different combinations of 1,2,3,4.", program_name);
-    process::exit(1);
+/// Program to get the permutations for a given number of digits.
+#[derive(Parser, Debug)]
+#[command(author, version, about, long_about = None)]
+struct Args {
+    /// Number of digits for the permutations
+    #[arg(short, long)]
+    digits: usize,
+
+    /// If true, then the permutations are not printed to stdout
+    #[arg(short, long, default_value_t = false)]
+    skip_printing: bool,
 }
 
+
 fn main() {
-    if env::args().len() != 2 {
-        let args: Vec<String> = env::args().collect();
-        print_usage_and_exit(&args[0]);
-    }
-    let args: Vec<String> = env::args().collect();
-    let digit_str = &args[1];
+    let args = Args::parse();
+    //println!("Number of digits: {}, skip printing output: {}", args.digits, args.skip_printing);
 
-
-    // Attempt to parse the string as an integer
-    match digit_str.parse::<usize>() {
-        Ok(digit_int) => {
-            println!("I am going to create permutations for {} digits ...", digit_int);
-            print_permutions(digit_int)
-        },
-        Err(_) => {
-            println!("Failed to parse the string as an unsigned integer");
-            process::exit(1);
-        }
-    }
+    println!("I am going to create permutations for {} digits ...", args.digits);
+    print_permutions(args.digits, args.skip_printing)
 }
 
 fn create_permutation_entry(number_count: usize) -> Vec<usize> {
@@ -112,14 +104,16 @@ fn permutation_to_str(elem: &Vec<usize>) -> String {
     ret
 }
 
-fn print_permutions(number_count: usize) {
+fn print_permutions(number_count: usize, skip_printing_output: bool) {
 	let input = create_permutation_entry(number_count);
     
 	let permutations_vector = permutations(&input);
     println!("Number of permutations: {}\n\n", permutations_vector.len());
-	// for (i,elem) in permutations_vector.iter().enumerate() {
-	// 	println!("{}: {}", i, permutation_to_str(&elem))
-	// }
+    if ! skip_printing_output {
+        for (i,elem) in permutations_vector.iter().enumerate() {
+            println!("{}: {}", i, permutation_to_str(&elem))
+        }    
+    }
 }
 
 
@@ -135,6 +129,7 @@ fn factorial(n: usize) -> usize {
 fn test_permutations() {
 	let input = create_permutation_entry(4);    
 	let permutations_vector = permutations(&input);
+    assert_eq!(permutations_vector.len(), 24)
 }
 
 #[test]
