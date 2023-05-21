@@ -1,6 +1,8 @@
 
 use clap::Parser;
 
+use indicatif::ProgressBar;
+
 
 /// Program to get the permutations for a given number of digits.
 #[derive(Parser, Debug)]
@@ -15,12 +17,18 @@ struct Args {
     skip_printing: bool,
 }
 
+trait ProgressHandler {
+    fn init(&mut self, number_of_steps: usize);
+    fn progress(&mut self, step: usize);
+    fn done(&mut self);
+}
+
 
 fn main() {
     let args = Args::parse();
     //println!("Number of digits: {}, skip printing output: {}", args.digits, args.skip_printing);
 
-    println!("I am going to create permutations for {} digits ...", args.digits);
+    //println!("I am going to create permutations for {} digits ...", args.digits);
     print_permutions(args.digits, args.skip_printing)
 }
 
@@ -54,7 +62,7 @@ fn get_rest_slice(input: &Vec<usize>, used_index: usize) -> Vec<usize> {
 
 // takes an vector with uniqe digits and returns another vector that
 // contains all permutations of the input
-fn permutations(input: &Vec<usize>) -> Vec<Vec<usize>> {
+fn permutations(input: &Vec<usize>, progress_handler: &mut Option<&mut impl ProgressHandler>) -> Vec<Vec<usize>> {
 	let input_len = input.len();
     // the algorithm ...
 	if input_len == 2 {
@@ -80,7 +88,55 @@ fn permutations(input: &Vec<usize>) -> Vec<Vec<usize>> {
 		let perm_count_0 = factorial(input_len_prev);
 		for i in 0 .. input_len { // we loop over all elems of the input ...
             let rest_slice = get_rest_slice(&input, i);         // get a slice w/o the current digit
-            let rest_permutations = permutations(&rest_slice);  // .. and get the permutations for the
+            let rest_permutations = permutations2(&rest_slice);  // .. and get the permutations for the
+                                                                                        // rest slice
+			for j in 0 .. perm_count_0 { // we loop over all permutations for one digit ...
+                let index = (i * perm_count_0) + j;
+                ret[index as usize][0] = input[i];  // ... and fill in for all possible permutations
+                                                    // the current digits in the result vector
+
+                for k in 1 .. input_len {    // here we start to copy the result permutations for the rest slice
+                    ret[index as usize][k] = rest_permutations[j as usize][k-1]
+                }
+            }
+            if progress_handler.is_some() {
+                progress_handler.as_mut().unwrap().progress(i);
+            }
+        }
+        if progress_handler.is_some() {
+            progress_handler.as_mut().unwrap().done();
+        }
+        ret
+    }
+}
+
+fn permutations2(input: &Vec<usize>) -> Vec<Vec<usize>> {
+	let input_len = input.len();
+    // the algorithm ...
+	if input_len == 2 {
+        // basically we only know for sure, what the permutations for two digits are ...
+        // ... so we create a return vector that contains two entries, with the permutations
+        // of input[0] and input[1]
+        let mut ret: Vec<Vec<usize>> = Vec::new();
+        ret.push(input.clone());
+        let mut p: Vec<usize> = Vec::new();
+        p.push(input[1]);
+        p.push(input[0]);
+        ret.push(p);
+        ret
+	} else {
+        // if the number of digits larger than two, we are unsure and lazy. What we know
+        // for sure is that n digits have n! permutations ...
+
+        // we create a vector of size n!
+        let mut ret = create_permutations_array(input_len);
+        let input_len_prev: usize = input_len - 1;
+
+        // ... how many permutations has every unique digit, with itself in the first place
+		let perm_count_0 = factorial(input_len_prev);
+		for i in 0 .. input_len { // we loop over all elems of the input ...
+            let rest_slice = get_rest_slice(&input, i);         // get a slice w/o the current digit
+            let rest_permutations = permutations2(&rest_slice);  // .. and get the permutations for the
                                                                                         // rest slice
 			for j in 0 .. perm_count_0 { // we loop over all permutations for one digit ...
                 let index = (i * perm_count_0) + j;
@@ -104,15 +160,51 @@ fn permutation_to_str(elem: &Vec<usize>) -> String {
     ret
 }
 
+struct ProgressBarProgressHandler {
+    pb: Option<ProgressBar>
+}
+
+impl ProgressBarProgressHandler {
+    fn new() -> ProgressBarProgressHandler {
+        ProgressBarProgressHandler {
+            pb: None
+        }
+    }
+}
+
+impl ProgressHandler for ProgressBarProgressHandler {
+    fn init(&mut self, number_of_steps: usize) {
+        let progress_bar = ProgressBar::new(number_of_steps as u64);
+        if self.pb.is_some() {
+            self.pb = Some(progress_bar)
+        }
+    }
+    fn progress(&mut self, _step: usize) {
+        if self.pb.is_some()  {
+            self.pb.as_mut().unwrap().inc(1);
+        }
+    }
+
+    fn done(&mut self) {
+        if self.pb.is_some()  {
+            self.pb.as_mut().unwrap().finish_with_message("done :)");
+        }
+    }
+}
+
 fn print_permutions(number_count: usize, skip_printing_output: bool) {
 	let input = create_permutation_entry(number_count);
+
+    let mut progress_handler = ProgressBarProgressHandler::new();
+    let mut ph_option = Some(&mut progress_handler);
+
+	let permutations_vector = permutations(&input, &mut ph_option);
     
-	let permutations_vector = permutations(&input);
     println!("Number of permutations: {}\n\n", permutations_vector.len());
     if ! skip_printing_output {
         for (i,elem) in permutations_vector.iter().enumerate() {
             println!("{}: {}", i, permutation_to_str(&elem))
-        }    
+        }
     }
 }
 
