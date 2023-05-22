@@ -1,7 +1,7 @@
 
 use clap::Parser;
 
-use indicatif::ProgressBar;
+use indicatif::{ProgressBar, ProgressStyle};
 
 
 /// Program to get the permutations for a given number of digits.
@@ -18,9 +18,7 @@ struct Args {
 }
 
 trait ProgressHandler {
-    fn init(&mut self, number_of_steps: usize);
     fn progress(&mut self, step: usize);
-    fn done(&mut self);
 }
 
 
@@ -62,7 +60,7 @@ fn get_rest_slice(input: &Vec<usize>, used_index: usize) -> Vec<usize> {
 
 // takes an vector with uniqe digits and returns another vector that
 // contains all permutations of the input
-fn permutations(input: &Vec<usize>, progress_handler: &mut Option<&mut impl ProgressHandler>) -> Vec<Vec<usize>> {
+fn permutations<'a>(input: &Vec<usize>, progress_handler: &mut Option<&'a mut impl ProgressHandler>) -> Vec<Vec<usize>> {
 	let input_len = input.len();
     // the algorithm ...
 	if input_len == 2 {
@@ -102,9 +100,6 @@ fn permutations(input: &Vec<usize>, progress_handler: &mut Option<&mut impl Prog
             if progress_handler.is_some() {
                 progress_handler.as_mut().unwrap().progress(i);
             }
-        }
-        if progress_handler.is_some() {
-            progress_handler.as_mut().unwrap().done();
         }
         ret
     }
@@ -160,34 +155,22 @@ fn permutation_to_str(elem: &Vec<usize>) -> String {
     ret
 }
 
-struct ProgressBarProgressHandler {
-    pb: Option<ProgressBar>
+struct ProgressBarProgressHandler<'a> {
+    pb: Option<&'a ProgressBar>
 }
 
-impl ProgressBarProgressHandler {
-    fn new() -> ProgressBarProgressHandler {
+impl <'a> ProgressBarProgressHandler<'a> {
+    fn new(progress_bar: &'a ProgressBar) -> ProgressBarProgressHandler {
         ProgressBarProgressHandler {
-            pb: None
+            pb: Some(progress_bar)
         }
     }
 }
 
-impl ProgressHandler for ProgressBarProgressHandler {
-    fn init(&mut self, number_of_steps: usize) {
-        let progress_bar = ProgressBar::new(number_of_steps as u64);
-        if self.pb.is_some() {
-            self.pb = Some(progress_bar)
-        }
-    }
+impl <'a>ProgressHandler for ProgressBarProgressHandler<'a> {
     fn progress(&mut self, _step: usize) {
         if self.pb.is_some()  {
             self.pb.as_mut().unwrap().inc(1);
-        }
-    }
-
-    fn done(&mut self) {
-        if self.pb.is_some()  {
-            self.pb.as_mut().unwrap().finish_with_message("done :)");
         }
     }
 }
@@ -195,11 +178,22 @@ impl ProgressHandler for ProgressBarProgressHandler {
 fn print_permutions(number_count: usize, skip_printing_output: bool) {
 	let input = create_permutation_entry(number_count);
 
-    let mut progress_handler = ProgressBarProgressHandler::new();
+    let mut progress_bar = ProgressBar::new(number_count as u64);
+
+
+    let sty = ProgressStyle::with_template(
+        "[{elapsed_precise}] {bar:40.cyan/blue} {pos:>7}/{len:7} {msg}",
+    )
+    .unwrap()
+    .progress_chars("##-");
+    let mut progress_handler = ProgressBarProgressHandler::new(& progress_bar);
+    progress_bar.set_style(sty.clone());
+
+
     let mut ph_option = Some(&mut progress_handler);
 
 	let permutations_vector = permutations(&input, &mut ph_option);
-    
+    progress_bar.finish();
     println!("Number of permutations: {}\n\n", permutations_vector.len());
     if ! skip_printing_output {
         for (i,elem) in permutations_vector.iter().enumerate() {
