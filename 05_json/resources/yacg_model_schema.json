@@ -1,0 +1,740 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "yacg inner type model",
+    "description": "model types used internally to provide loaded models for the code generators",
+    "version": "5.6.6",
+    "x-domain": "yacg.model.model",
+    "definitions": {
+        "Type": {
+            "type": "object",
+            "description": "Dummy base class to implement strong typed references",
+            "properties": {
+                "processing": {
+                    "description": "anchor to store codegen runtime data, for instance for the random data creation",
+                    "type": "object"
+                }
+            },
+            "x-tags": [
+                "metaModelType"
+            ]
+        },
+        "ObjectType": {
+            "type": "object",
+            "description": "Straight out of hell - a undefined object type",
+            "allOf": [
+                {
+                    "$ref": "#/definitions/Type"
+                }
+            ],
+            "x-tags": [
+                "metaModelType"
+            ]
+        },
+        "IntegerType": {
+            "type": "object",
+            "description": "integer values",
+            "allOf": [
+                {
+                    "$ref": "#/definitions/Type"
+                },
+                {
+                    "properties": {
+                        "format": {
+                            "type": "string",
+                            "enum": [
+                                "int32",
+                                "int64"
+                            ]
+                        },
+                        "default": {
+                            "type": "integer"
+                        },
+                        "minimum": {
+                            "type": "integer"
+                        },
+                        "exclusiveMinimum": {
+                            "type": "integer"
+                        },
+                        "maximum": {
+                            "type": "integer"
+                        },
+                        "exclusiveMaximum": {
+                            "type": "integer"
+                        }
+                    }
+                }
+            ],
+            "x-tags": [
+                "metaModelType"
+            ]
+        },
+        "NumberType": {
+            "type": "object",
+            "description": "floating point values",
+            "allOf": [
+                {
+                    "$ref": "#/definitions/Type"
+                },
+                {
+                    "properties": {
+                        "format": {
+                            "type": "string",
+                            "enum": [
+                                "float",
+                                "double"
+                            ]
+                        },
+                        "default": {
+                            "type": "number"
+                        },
+                        "minimum": {
+                            "type": "number"
+                        },
+                        "exclusiveMinimum": {
+                            "type": "number"
+                        },
+                        "maximum": {
+                            "type": "number"
+                        },
+                        "exclusiveMaximum": {
+                            "type": "number"
+                        }
+                    }
+                }
+            ],
+            "x-tags": [
+                "metaModelType"
+            ]
+        },
+        "BooleanType": {
+            "type": "object",
+            "description": "boolean values",
+            "allOf": [
+                {
+                    "$ref": "#/definitions/Type"
+                },
+                {
+                    "properties": {
+                        "default": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            ],
+            "x-tags": [
+                "metaModelType"
+            ]
+        },
+        "StringType": {
+            "type": "object",
+            "description": "integer values",
+            "allOf": [
+                {
+                    "$ref": "#/definitions/Type"
+                },
+                {
+                    "properties": {
+                        "default": {
+                            "type": "string"
+                        },
+                        "minLength": {
+                            "type": "number"
+                        },
+                        "maxLength": {
+                            "type": "number"
+                        },
+                        "pattern": {
+                            "type": "string"
+                        }
+                    }
+                }
+            ],
+            "x-tags": [
+                "metaModelType"
+            ]
+        },
+        "UuidType": {
+            "type": "object",
+            "description": "UUID values",
+            "allOf": [
+                {
+                    "$ref": "#/definitions/Type"
+                },
+                {
+                    "properties": {
+                        "default": {
+                            "type": "string"
+                        }
+                    }
+                }
+            ],
+            "x-tags": [
+                "metaModelType"
+            ]
+        },
+        "EnumType": {
+            "type": "object",
+            "description": "type for enum values - fixed value types",
+            "allOf": [
+                {
+                    "$ref": "#/definitions/Type"
+                },
+                {
+                    "properties": {
+                        "version": {
+                            "description": "is taken from the version entry of the file, optional",
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "domain": {
+                            "description": "scope/domain to that this type belongs",
+                            "$comment": "optional, can be used for domain driven modelling",
+                            "type": "string"
+                        },
+                        "source": {
+                            "description": "from what file the Type was loaded",
+                            "$comment": "basically a nomalized fileName with path",
+                            "type": "string"
+                        },
+                        "description": {
+                            "type": "string"
+                        },
+                        "type": {
+                            "description": "only a string or numeric type make sense",
+                            "$ref": "#/definitions/Type",
+                            "x-tags": [
+                                "constructorValue"
+                            ]
+                        },
+                        "numValues": {
+                            "type": "array",
+                            "items": {
+                                "type": "number"
+                            }
+                        },
+                        "values": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "valuesMap": {
+                            "description": "additional enum values",
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        },
+                        "default": {
+                            "type": "string"
+                        },
+                        "topLevelType": {
+                            "type": "boolean",
+                            "default": false
+                        },
+                        "tags": {
+                            "description": "additional flags to mark a type",
+                            "$comment": "custom extension marked with 'x-tags'",
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Tag"
+                            }
+                        }
+                    }
+                }
+            ],
+            "x-tags": [
+                "metaModelType"
+            ]
+        },
+        "DateType": {
+            "type": "object",
+            "description": "type for date values",
+            "allOf": [
+                {
+                    "$ref": "#/definitions/Type"
+                },
+                {
+                    "properties": {
+                        "default": {
+                            "type": "string",
+                            "format": "date"
+                        },
+                        "minimum": {
+                            "type": "string",
+                            "format": "date"
+                        },
+                        "exclusiveMinimum": {
+                            "type": "string",
+                            "format": "date"
+                        },
+                        "maximum": {
+                            "type": "string",
+                            "format": "date"
+                        },
+                        "exclusiveMaximum": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                }
+            ],
+            "x-tags": [
+                "metaModelType"
+            ]
+        },
+        "TimeType": {
+            "type": "object",
+            "description": "type for time values",
+            "allOf": [
+                {
+                    "$ref": "#/definitions/Type"
+                },
+                {
+                    "properties": {
+                        "default": {
+                            "type": "string",
+                            "format": "time"
+                        },
+                        "minimum": {
+                            "type": "string",
+                            "format": "time"
+                        },
+                        "exclusiveMinimum": {
+                            "type": "string",
+                            "format": "time"
+                        },
+                        "maximum": {
+                            "type": "string",
+                            "format": "time"
+                        },
+                        "exclusiveMaximum": {
+                            "type": "string",
+                            "format": "time"
+                        }
+                    }
+                }
+            ],
+            "x-tags": [
+                "metaModelType"
+            ]
+        },
+        "DateTimeType": {
+            "type": "object",
+            "description": "type for timestamp values",
+            "allOf": [
+                {
+                    "$ref": "#/definitions/Type"
+                },
+                {
+                    "properties": {
+                        "default": {
+                            "type": "string",
+                            "format": "date-time"
+                        },
+                        "minimum": {
+                            "type": "string",
+                            "format": "date-time"
+                        },
+                        "exclusiveMinimum": {
+                            "type": "string",
+                            "format": "date-time"
+                        },
+                        "maximum": {
+                            "type": "string",
+                            "format": "date-time"
+                        },
+                        "exclusiveMaximum": {
+                            "type": "string",
+                            "format": "date-time"
+                        }
+                    }
+                }
+            ],
+            "x-tags": [
+                "metaModelType"
+            ]
+        },
+        "DurationType": {
+            "type": "object",
+            "description": "type for date values",
+            "allOf": [
+                {
+                    "$ref": "#/definitions/Type"
+                },
+                {
+                    "properties": {
+                        "default": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                }
+            ],
+            "x-tags": [
+                "metaModelType"
+            ]
+        },
+        "BytesType": {
+            "type": "object",
+            "description": "type for byte values, it will usually be rendered to a byte array",
+            "allOf": [
+                {
+                    "$ref": "#/definitions/Type"
+                },
+                {
+                    "properties": {
+                        "default": {
+                            "type": "string",
+                            "format": "byte"
+                        }
+                    }
+                }
+            ],
+            "x-tags": [
+                "metaModelType"
+            ]
+        },
+        "ComplexType": {
+            "type": "object",
+            "description": "complex type description",
+            "allOf": [
+                {
+                    "$ref": "#/definitions/Type"
+                },
+                {
+                    "properties": {
+                        "version": {
+                            "description": "is taken from the version entry of the file, optional",
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "description": {
+                            "type": "string"
+                        },
+                        "domain": {
+                            "description": "scope/domain to that this type belongs",
+                            "$comment": "optional, can be used for domain driven modelling",
+                            "type": "string"
+                        },
+                        "source": {
+                            "description": "from what file the Type was loaded",
+                            "$comment": "basically a nomalized fileName with path",
+                            "type": "string"
+                        },
+                        "extendsType": {
+                            "description": "in case of inheritance points this attrib to the base type",
+                            "$ref": "#/definitions/ComplexType"
+                        },
+                        "extendedBy": {
+                            "description": "list of types that extend this type",
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/ComplexType"
+                            }
+                        },
+                        "referencedBy": {
+                            "description": "types that hold attribute references to that type",
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/ComplexType"
+                            }
+                        },
+                        "properties": {
+                            "description": "properties of that type",
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Property"
+                            }
+                        },
+                        "topLevelType": {
+                            "type": "boolean",
+                            "default": false
+                        },
+                        "tags": {
+                            "description": "additional flags to mark a type",
+                            "$comment": "custom extension marked with 'x-tags'",
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Tag"
+                            }
+                        }
+                    }
+                }
+            ],
+            "x-tags": [
+                "metaModelType"
+            ]
+        },
+        "DictionaryType": {
+            "type": "object",
+            "description": "key/value dictionary type. Keys are always strings, the value type can be specified",
+            "allOf": [
+                {
+                    "$ref": "#/definitions/Type"
+                },
+                {
+                    "properties": {
+                        "version": {
+                            "description": "is taken from the version entry of the file, optional",
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "description": {
+                            "type": "string"
+                        },
+                        "domain": {
+                            "description": "scope/domain to that this type belongs",
+                            "$comment": "optional, can be used for domain driven modelling",
+                            "type": "string"
+                        },
+                        "source": {
+                            "description": "from what file the Type was loaded",
+                            "$comment": "basically a nomalized fileName with path",
+                            "type": "string"
+                        },
+                        "referencedBy": {
+                            "description": "types that hold attribute references to that type",
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/ComplexType"
+                            }
+                        },
+                        "valueType": {
+                            "description": "either a basic or a complex type",
+                            "$ref": "#/definitions/Type",
+                            "x-tags": [
+                                "constructorValue"
+                            ]
+                        },
+                        "topLevelType": {
+                            "type": "boolean",
+                            "default": false
+                        },
+                        "tags": {
+                            "description": "additional flags to mark a type",
+                            "$comment": "custom extension marked with 'x-tags'",
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Tag"
+                            }
+                        }
+                    }
+                }
+            ],
+            "x-tags": [
+                "metaModelType"
+            ]
+        },
+        "ArrayType": {
+            "type": "object",
+            "description": "Array type",
+            "allOf": [
+                {
+                    "$ref": "#/definitions/Type"
+                },
+                {
+                    "properties": {
+                        "version": {
+                            "description": "is taken from the version entry of the file, optional",
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "description": {
+                            "type": "string"
+                        },
+                        "domain": {
+                            "description": "scope/domain to that this type belongs",
+                            "$comment": "optional, can be used for domain driven modelling",
+                            "type": "string"
+                        },
+                        "source": {
+                            "description": "from what file the Type was loaded",
+                            "$comment": "basically a nomalized fileName with path",
+                            "type": "string"
+                        },
+                        "referencedBy": {
+                            "description": "types that hold attribute references to that type",
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/ComplexType"
+                            }
+                        },
+                        "itemsType": {
+                            "description": "either a basic or a complex type",
+                            "$ref": "#/definitions/Type",
+                            "x-tags": [
+                                "constructorValue"
+                            ]
+                        },
+                        "topLevelType": {
+                            "type": "boolean",
+                            "default": false
+                        },
+                        "tags": {
+                            "description": "additional flags to mark a type",
+                            "$comment": "custom extension marked with 'x-tags'",
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Tag"
+                            }
+                        },
+                        "arrayConstraints": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/ArrayConstraints"
+                            }
+                        },
+                        "arrayDimensions": {
+                            "description": "if isArray true you can specify here the number of the array dimensions",
+                            "type": "integer"
+                        }
+                    }
+                }
+            ],
+            "x-tags": [
+                "metaModelType"
+            ]
+        },
+        "Property": {
+            "type": "object",
+            "description": "a property of a type",
+            "properties": {
+                "name": {
+                    "description": "type unique identifier",
+                    "type": "string",
+                    "$comment": "ordinal example",
+                    "x-ordinal": 1000,
+                    "x-tags": [
+                        "constructorValue"
+                    ]
+                },
+                "isArray": {
+                    "description": "true - if the property is an array",
+                    "type": "boolean",
+                    "default": false
+                },
+                "arrayDimensions": {
+                    "description": "if isArray true you can specify here the number of the array dimensions",
+                    "type": "integer"
+                },
+                "arrayConstraints": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ArrayConstraints"
+                    }
+                },
+                "type": {
+                    "description": "either a basic or a complex type",
+                    "$ref": "#/definitions/Type",
+                    "x-tags": [
+                        "constructorValue"
+                    ]
+                },
+                "tags": {
+                    "description": "additional flags to mark a property",
+                    "$comment": "custom extension marked with 'x-tags'",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Tag"
+                    }
+                },
+                "description": {
+                    "description": "optional description from the model file",
+                    "type": "string"
+                },
+                "required": {
+                    "description": "is set to true if the attribute is marked as required in the model",
+                    "type": "boolean",
+                    "default": false
+                },
+                "ordinal": {
+                    "description": "ordinal number/position of that attribute. Used in protobuf e.g.",
+                    "type": "integer"
+                },
+                "isKey": {
+                    "description": "is set to true if the attribute is the key of the type",
+                    "type": "boolean",
+                    "default": false
+                },
+                "isVisualKey": {
+                    "description": "is set to true if the attribute is some kind of a name, caption, label or anther kind of visual key",
+                    "type": "boolean",
+                    "default": false
+                },
+                "foreignKey": {
+                    "description": "content of the 'x-ref' entry of a property, points to an implicit referenced type, e.g. for IDs",
+                    "$ref": "#/definitions/Type"
+                },
+                "format": {
+                    "description": "holds the original 'format' value from the schema",
+                    "type": "string"
+                },
+                "processing": {
+                    "description": "anchor to store codegen runtime data, for instance for the random data creation",
+                    "type": "object"
+                }
+            }
+        },
+        "ArrayConstraints": {
+            "type": "object",
+            "properties": {
+                "arrayMinItems": {
+                    "description": "defined minimum of elements in the array/list",
+                    "type": "integer"
+                },
+                "arrayMaxItems": {
+                    "description": "defined maximum of elements in the array/list",
+                    "type": "integer"
+                },
+                "arrayUniqueItems": {
+                    "description": "the elements in the array/list have to be unique",
+                    "type": "boolean",
+                    "default": false
+                }
+            }
+        },
+        "ForeignKey": {
+            "description": "Type describes the reference of a property to another field in the model",
+            "type": "object",
+            "properties": {
+                "type": {
+                    "$ref": "#/definitions/Type"
+                },
+                "propertyName": {
+                    "type": "string"
+                },
+                "property": {
+                    "$ref": "#/definitions/Property"
+                }
+            }
+        },
+        "Tag": {
+            "type": "object",
+            "description": "a tag type",
+            "$comment": "this type can be used to implement additional grouping or marks for processing",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "x-tags": [
+                        "constructorValue"
+                    ]
+                },
+                "value": {
+                    "type": "string",
+                    "x-tags": [
+                        "constructorValue"
+                    ]
+                }
+            }
+        }
+    }
+}
