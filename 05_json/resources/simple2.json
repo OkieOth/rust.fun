@@ -1,0 +1,21 @@
+[
+    {
+        "string": "I am a text",
+        "b": false,
+        "uuid": "cd018a97-8b20-45eb-9eb4-de14baf3ac17"
+    },
+    {
+        "string": "Some more words",
+        "zahl": 1234
+    },
+    {
+        "b": true,
+        "uuid": "dbc04b11-c72c-4e3e-a8fa-3df18c15611f"
+    },
+    {
+        "string": "Ich bin ein Text",
+        "zahl": 1.234,
+        "b": true,
+        "uuid": "25fbb334-1b6f-471d-ad88-d5ebbdae1a1e"
+    }
+]
