@@ -1,0 +1,150 @@
+
+@startuml
+hide empty methods
+hide empty fields
+
+
+class "**Layer**" as Layer {
+        UuidType id
+        StringType name
+        IntegerType minZoom
+        IntegerType maxZoom
+        StringType description
+        LayerDummyEnum dummy
+}
+note top: A layer definition
+
+ 
+
+enum "LayerDummyEnum" as LayerDummyEnum {
+    VALUE1
+    VALUE2
+    VALUE3
+}
+
+class "**LayerContent**" as LayerContent {
+        UuidType id
+        UuidType layerId<color:grey>"" // -> Layer""</color>
+        StringType projection
+        Geometry geometry
+        Map<StringType> data
+        DisplayConfig display
+}
+note top: a feature to display
+
+ 
+
+class "**Geometry**" as Geometry {
+        NumberType[] point
+        NumberType[][] multiPoint
+        NumberType[][] lineString
+        NumberType[][][] multiLineString
+        NumberType[][][] polygon
+        NumberType[][][][] multiPolygon
+}
+note top: Geometry definition to display the\nfeature
+
+ 
+
+
+class "**DisplayConfig**" as DisplayConfig {
+        DisplayConfigStroke stroke
+        DisplayConfigFill fill
+        StringType icon
+}
+note top: Optional configuration to display a\nfeature
+
+ 
+
+class "**Color**" as Color {
+        IntegerType red
+        IntegerType green
+        IntegerType blue
+        IntegerType alpha
+}
+note top: The color definition to display\na feature
+
+ 
+
+class "DisplayConfigStroke" as DisplayConfigStroke {
+        IntegerType width
+        IntegerType[] dashArray
+        IntegerType dashOffset
+        Color color
+}
+
+ 
+
+class "DisplayConfigFill" as DisplayConfigFill {
+        Color color
+}
+
+ 
+
+class "**PointGeometry**" as PointGeometry extends List {
+}
+
+class "**PointGeometryArray**" as PointGeometryArray extends List {
+}
+
+class "**PointGeometryArrayArray**" as PointGeometryArrayArray extends List {
+}
+
+class "**PointGeometryArrayArrayArray**" as PointGeometryArrayArrayArray extends List {
+}
+
+
+    
+
+
+
+
+
+
+    
+    
+
+
+LayerContent .. Layer
+            
+
+LayerContent  *--  Geometry
+
+
+LayerContent  *--  DisplayConfig
+
+    
+
+
+
+
+
+
+    
+    
+DisplayConfig  *--  DisplayConfigStroke
+
+DisplayConfig  *--  DisplayConfigFill
+
+
+    
+
+
+
+
+    
+
+
+
+DisplayConfigStroke  *--  Color
+
+    
+DisplayConfigFill  *--  Color
+
+    
+    
+    
+    
+
+footer \ngenerated with yacg (https://github.com/OkieOth/yacg),\n(template: plantUml.mako v1.1.0)\npowered by plantuml (https://plantuml.com/)
+@enduml

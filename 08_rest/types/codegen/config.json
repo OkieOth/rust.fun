@@ -1,0 +1,39 @@
+[
+    {
+        "name": "main",
+        "description": "code gen configuration for the business types",
+        "models": [ {
+            "schema": "/project/models/layer.yaml"
+            }
+        ],
+        "tasks": [
+            {
+                "name": "plantuml",
+                "singleFileTask": {
+                    "template": "plantUml",
+                    "destFile": "/project/docs/generated/layer_model.puml"
+                }
+            },
+            {
+                "name": "types",
+                "singleFileTask": {
+                    "template": "/project/codegen/templates/rust_types.mako",
+                    "destFile": "/project/src/layer.rs"
+                }
+            },
+            {
+                "name": "types_tests",
+                "singleFileTask": {
+                    "template": "/project/codegen/templates/rust_types_test.mako",
+                    "destFile": "/project/src/layer_test.txt",
+                    "templateParams": [
+                        {
+                          "name": "modelPackage",
+                          "value": "layer"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+]

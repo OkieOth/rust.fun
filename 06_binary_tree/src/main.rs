@@ -80,12 +80,109 @@ impl<T: std::cmp::PartialOrd> BinaryTree<T> {
     }
 }
 
+struct SplitReturn<'a> {
+    key: &'a str,
+    left: Option<&'a str>,
+    right: Option<&'a str>
+}
+
+enum SplitState {
+    SearchForKeyEnd,
+    SearchForChildSplit,
+    SearchForKeyChildEnd
+}
+
+fn split_binary_tree_string<'a>(s: &'a str) -> SplitReturn {
+    // got something like that ... 3(2(1,2),5(4,))
+    
+    let mut state= SplitState::SearchForKeyEnd;
+    let mut ret = SplitReturn {
+        key: "",
+        left: None,
+        right: None,
+    };
+
+    let mut open_bracket: i32 = -1;
+    let mut child_split: i32 = -1;
+    let mut bracket_count: usize = 0;
+
+    for (i, c) in s.char_indices() {
+        match state {
+            SplitState::SearchForKeyEnd => {
+                match c {
+                    '(' => {
+                        // found end of key
+                        ret.key = &s[0 .. i];
+                        open_bracket = i as i32;
+                        bracket_count = 1;
+                        state = SplitState::SearchForChildSplit;
+                    },
+                    ',' => {
+                        // no key available ... e. g. `,4`
+                    },
+                    _ => {
+                        // look at next char
+                    }
+                }
+            },
+            SplitState::SearchForChildSplit => {
+                match c {
+                    '(' => {
+                        // found end of key
+                        bracket_count += 1;
+                    },
+                    ')' => {
+                        // found end of key
+                        bracket_count -= 1;
+                        if bracket_count == 0 {
+                            // TODO ... wrong format???
+                        }
+                    },
+                    ',' => {
+                        if bracket_count == 1 {
+                            child_split = i as i32;
+                            let start_slice: usize = (open_bracket as usize) + 1;
+                            ret.left = Some(&s[start_slice .. i]);
+                            state = SplitState::SearchForKeyChildEnd;
+                        }
+                        // no key available ... e. g. `,4`
+                    },
+                    _ => {
+                        // look at next char
+                    }
+                };
+            },
+            SplitState::SearchForKeyChildEnd => {
+                match c {
+                    '(' => {
+                        // found end of key
+                        bracket_count += 1;
+                    },
+                    ')' => {
+                        // found end of key
+                        bracket_count -= 1;
+                        if bracket_count == 0 {
+                            let start_slice: usize = (child_split as usize) + 1;
+                            ret.right = Some(&s[start_slice .. i]);
+                        }
+                    },
+                    _ => {
+                        // look at next char
+                    }
+                }
+            },
+        }
+        println!("  c={}", c)
+    }
+    SplitReturn { key: s, left: Some(s), right: None }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::BinaryTree;
 
     #[test]
-    fn createBinaryTree() {
+    fn create_binary_tree() {
         let mut bt = BinaryTree::new();
         assert!(bt.root.is_none());
         assert_eq!(bt.nodeCount, 0);
@@ -102,6 +199,11 @@ mod tests {
         assert!(bt.root.is_some());
         assert_eq!(bt.nodeCount, 3);
     }
+
+    fn test_split_binary_tree_string() {
+
+    }
+
 }
 
 fn main() {
