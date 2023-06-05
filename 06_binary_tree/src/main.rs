@@ -142,7 +142,9 @@ fn split_binary_tree_string<'a>(s: &'a str) -> SplitReturn {
                         if bracket_count == 1 {
                             child_split = i as i32;
                             let start_slice: usize = (open_bracket as usize) + 1;
-                            ret.left = Some(&s[start_slice .. i]);
+                            if start_slice < i {
+                                ret.left = Some(&s[start_slice .. i]);
+                            }
                             state = SplitState::SearchForKeyChildEnd;
                         }
                         // no key available ... e. g. `,4`
@@ -163,7 +165,9 @@ fn split_binary_tree_string<'a>(s: &'a str) -> SplitReturn {
                         bracket_count -= 1;
                         if bracket_count == 0 {
                             let start_slice: usize = (child_split as usize) + 1;
-                            ret.right = Some(&s[start_slice .. i]);
+                            if start_slice < i {
+                                ret.right = Some(&s[start_slice .. i]);
+                            }
                         }
                     },
                     _ => {
@@ -174,12 +178,48 @@ fn split_binary_tree_string<'a>(s: &'a str) -> SplitReturn {
         }
         println!("  c={}", c)
     }
-    SplitReturn { key: s, left: Some(s), right: None }
+    if ret.key == "" {
+        ret.key = s;
+    }
+    return ret
 }
 
 #[cfg(test)]
 mod tests {
     use crate::BinaryTree;
+    use crate::split_binary_tree_string;
+
+    fn test_sprit_for_str<'a>(s: &str, has_left: bool, has_right: bool) {
+        let r01 = split_binary_tree_string(s);
+        let left01 = match r01.left {
+            Some(s) => s,
+            None => {
+                if has_left {
+                    assert!(false);
+                }
+                "???"
+            },
+        };
+        let right01 = match r01.right {
+            Some(s) => s,
+            None => {
+                if has_right {
+                    assert!(false);
+                }
+                "???"
+            },
+        };
+        println!("{} -> key: {}, l={}, r={}", s, r01.key, left01, right01);
+    }
+
+    #[test]
+    fn test_split_binary_tree_string() {
+        test_sprit_for_str("3(2(1,2),5(4,))", true, true);
+        test_sprit_for_str("2(1,2)", true, true);
+        test_sprit_for_str("5(4,)", true, false);
+        test_sprit_for_str("5(,4)", false, true);
+        test_sprit_for_str("5", false, false);
+    }
 
     #[test]
     fn create_binary_tree() {
@@ -198,10 +238,6 @@ mod tests {
         assert!(!bt.insert(5));
         assert!(bt.root.is_some());
         assert_eq!(bt.nodeCount, 3);
-    }
-
-    fn test_split_binary_tree_string() {
-
     }
 
 }
