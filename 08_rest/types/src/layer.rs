@@ -2,28 +2,36 @@
 // run of the code generation.
 // created by yacg (template: rust_types.mako v0.1.0)
 
+use serde_json;
+use serde::Deserialize;
+use uuid::Uuid;
+use std::collections::HashMap;
 
 
 /* A layer definition
 */
 pub struct Layer {
 
-    Id uuid.UUID
+    id: Uuid,
 
-    Name string
+    name: String,
 
-    MinZoom optional.Optional[int32]
+    min_zoom: i32,
 
-    MaxZoom optional.Optional[int32]
+    max_zoom: i32,
 
-    Description optional.Optional[string]
+    description: String,
 
     // this attrib has no real value, it's only there to challenge the enum handling
-    Dummy OptionalLayerDummyEnum
+    dummy: Option<LayerDummyEnum>,
 }
 
 
-
+pub enum LayerDummyEnum {
+    value1,
+    value2,
+    value3,
+}
 
 
 
@@ -31,18 +39,18 @@ pub struct Layer {
 */
 pub struct LayerContent {
 
-    Id uuid.UUID
+    id: Uuid,
 
-    LayerId optional.Optional[uuid.UUID]
+    layer_id: Uuid,
 
-    Projection optional.Optional[string]
+    projection: String,
 
-    Geometry OptionalGeometry
+    geometry: Option<Geometry>,
 
     // container for additional key/value pairs
-    Data optional.Optional[map[string]string]
+    data: HashMap<String, String>,
 
-    Display OptionalDisplayConfig
+    display: Option<DisplayConfig>,
 }
 
 
@@ -51,22 +59,22 @@ pub struct LayerContent {
 */
 pub struct Geometry {
 
-    Point []float64
+    point: Vec<f32>,
 
     // a geometry consisting of multiple separate points
-    MultiPoint [][]float64
+    multi_point: Vec<Vec<f32>>,
 
     // a geometry consisting of multiple connected line segments
-    LineString [][]float64
+    line_string: Vec<Vec<f32>>,
 
     // a geometry consisting of multiple multi-lines
-    MultiLineString [][][]float64
+    multi_line_string: Vec<Vec<Vec<f32>>>,
 
     // a closed geometry consisting of multiple connected line segments
-    Polygon [][][]float64
+    polygon: Vec<Vec<Vec<f32>>>,
 
     // a geometry consisting of multiple separate polygons
-    MultiPolygon [][][][]float64
+    multi_polygon: Vec<Vec<Vec<Vec<f32>>>>,
 }
 
 
@@ -77,11 +85,11 @@ pub struct Geometry {
 */
 pub struct DisplayConfig {
 
-    Stroke OptionalDisplayConfigStroke
+    stroke: Option<DisplayConfigStroke>,
 
-    Fill OptionalDisplayConfigFill
+    fill: Option<DisplayConfigFill>,
 
-    Icon optional.Optional[string]
+    icon: String,
 }
 
 
@@ -90,33 +98,33 @@ pub struct DisplayConfig {
 */
 pub struct Color {
 
-    Red int32
+    red: i32,
 
-    Green int32
+    green: i32,
 
-    Blue int32
+    blue: i32,
 
-    Alpha optional.Optional[int32]
+    alpha: i32,
 }
 
 
 
 pub struct DisplayConfigStroke {
 
-    Width optional.Optional[int32]
+    width: i32,
 
-    DashArray []int32
+    dash_array: Vec<i32>,
 
-    DashOffset optional.Optional[int32]
+    dash_offset: i32,
 
-    Color OptionalColor
+    color: Option<Color>,
 }
 
 
 
 pub struct DisplayConfigFill {
 
-    Color OptionalColor
+    color: Option<Color>,
 }
 
 

@@ -22,10 +22,10 @@
         elif isinstance(typeObj, model.ObjectType):
             ret = '()'
         elif isinstance(typeObj, model.NumberType):
-            if typeObj.format is None or typeObj.format == model.NumberTypeFormatEnum.DOUBLE:
-                ret = 'f64'
-            else:
+            if typeObj.format is None or typeObj.format != model.NumberTypeFormatEnum.DOUBLE:
                 ret = 'f32'
+            else:
+                ret = 'f64'
         elif isinstance(typeObj, model.BooleanType):
             ret = 'bool'
         elif isinstance(typeObj, model.StringType):
@@ -33,17 +33,19 @@
         elif isinstance(typeObj, model.BytesType):
             ret = 'byte'
         elif isinstance(typeObj, model.UuidType):
-            ret = 'uuid.UUID'
+            ret = 'Uuid'
         elif isinstance(typeObj, model.EnumType):
             ret = typeObj.name
         elif isinstance(typeObj, model.DateType):
-            ret = 'time.Date'
+            ret = 'Date'
         elif isinstance(typeObj, model.TimeType):
-            ret = 'time.Time'
+            ret = 'String'
         elif isinstance(typeObj, model.DateTimeType):
-            ret = 'time.Date'
+            ret = 'DateTime'
+        elif isinstance(typeObj, model.DurationType):
+            ret = 'Duration'
         elif isinstance(typeObj, model.DictionaryType):
-            ret = 'map[string]{}'.format(printRustType(typeObj.valueType, False, True))
+            ret = 'HashMap<String, {}>'.format(printRustType(typeObj.valueType, False, True))
         elif isinstance(typeObj, model.ComplexType):
             ret = typeObj.name
         else:
@@ -51,11 +53,15 @@
 
         if (not isRequired) and (not isArray):
             if isinstance(typeObj, model.EnumType) or hasattr(typeObj, "properties"):
-                ret = "Optional{}".format(ret)
-            else:
-                ret = "optional.Optional[{}]".format(ret)
+                ret = "Option<{}>".format(ret)
         if isArray:
-            ret = ("[]" * arrayDimensions) + ret
+            tmpStr = ""
+            for i in range(arrayDimensions):
+                tmpStr = tmpStr + "Vec<"
+            tmpStr = tmpStr + ret
+            for i in range(arrayDimensions):
+                tmpStr = tmpStr + ">"
+            ret = tmpStr
         return ret
 
     def getEnumDefaultValue(type):
@@ -81,10 +87,18 @@ use serde::Deserialize;
 % if modelFuncs.isUuidContained(modelTypes):
 use uuid::Uuid;
 % endif
-% if modelFuncs.isUuidContained(modelTypes):
-use uuid::Uuid;
+% if modelFuncs.isTypeContained(modelTypes, model.DictionaryType):
+use std::collections::HashMap;
 % endif
-
+%if modelFuncs.isTypeContained(modelTypes, model.DateType):
+use chrono::Date
+%endif
+%if modelFuncs.isTypeContained(modelTypes, model.DateTimeType):
+use chrono::DateTime
+%endif
+%if modelFuncs.isTypeContained(modelTypes, model.DurationType):
+use chrono::Duration
+%endif
 
 % for type in modelTypes:
     % if modelFuncs.isEnumType(type):
@@ -92,7 +106,11 @@ use uuid::Uuid;
 /* ${templateHelper.addLineBreakToDescription(type.description,4)}
 */
         % endif
-
+pub enum ${type.name} {
+        % for value in type.values:
+    ${value},
+        % endfor
+}
     % endif
 
     % if hasattr(type, "properties"):
@@ -106,7 +124,7 @@ pub struct ${type.name} {
             % if property.description != None:
     // ${property.description}
             % endif
-    ${stringUtils.toUpperCamelCase(property.name)} ${printRustType(property.type, property.isArray, property.required, property.arrayDimensions)}
+    ${stringUtils.toSnakeCase(property.name)}: ${printRustType(property.type, property.isArray, property.required, property.arrayDimensions)},
         % endfor
 }
 
