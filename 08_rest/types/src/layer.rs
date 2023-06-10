@@ -12,18 +12,34 @@ use std::collections::HashMap;
 */
 pub struct Layer {
 
-    id: Uuid,
+    pub id: Uuid,
 
-    name: String,
+    pub name: String,
 
-    min_zoom: i32,
+    pub min_zoom: Option<i32>,
 
-    max_zoom: i32,
+    pub max_zoom: Option<i32>,
 
-    description: String,
+    pub description: Option<String>,
 
     // this attrib has no real value, it's only there to challenge the enum handling
-    dummy: Option<LayerDummyEnum>,
+    pub dummy: Option<LayerDummyEnum>,
+}
+
+impl Layer {
+    pub fn new (
+        id: Uuid,
+        name: String,
+    ) -> Self {
+        Self {
+        id: id,
+        name: name,
+        min_zoom: None,
+        max_zoom: None,
+        description: None,
+        dummy: None,
+        }
+    }
 }
 
 
@@ -39,18 +55,33 @@ pub enum LayerDummyEnum {
 */
 pub struct LayerContent {
 
-    id: Uuid,
+    pub id: Uuid,
 
-    layer_id: Uuid,
+    pub layer_id: Option<Uuid>,
 
-    projection: String,
+    pub projection: Option<String>,
 
-    geometry: Option<Geometry>,
+    pub geometry: Option<Geometry>,
 
     // container for additional key/value pairs
-    data: HashMap<String, String>,
+    pub data: Option<HashMap<String, String>>,
 
-    display: Option<DisplayConfig>,
+    pub display: Option<DisplayConfig>,
+}
+
+impl LayerContent {
+    pub fn new (
+        id: Uuid,
+    ) -> Self {
+        Self {
+        id: id,
+        layer_id: None,
+        projection: None,
+        geometry: None,
+        data: None,
+        display: None,
+        }
+    }
 }
 
 
@@ -59,22 +90,36 @@ pub struct LayerContent {
 */
 pub struct Geometry {
 
-    point: Vec<f32>,
+    pub point: Option<Vec<f32>>,
 
     // a geometry consisting of multiple separate points
-    multi_point: Vec<Vec<f32>>,
+    pub multi_point: Option<Vec<Vec<f32>>>,
 
     // a geometry consisting of multiple connected line segments
-    line_string: Vec<Vec<f32>>,
+    pub line_string: Option<Vec<Vec<f32>>>,
 
     // a geometry consisting of multiple multi-lines
-    multi_line_string: Vec<Vec<Vec<f32>>>,
+    pub multi_line_string: Option<Vec<Vec<Vec<f32>>>>,
 
     // a closed geometry consisting of multiple connected line segments
-    polygon: Vec<Vec<Vec<f32>>>,
+    pub polygon: Option<Vec<Vec<Vec<f32>>>>,
 
     // a geometry consisting of multiple separate polygons
-    multi_polygon: Vec<Vec<Vec<Vec<f32>>>>,
+    pub multi_polygon: Option<Vec<Vec<Vec<Vec<f32>>>>>,
+}
+
+impl Geometry {
+    pub fn new (
+    ) -> Self {
+        Self {
+        point: None,
+        multi_point: None,
+        line_string: None,
+        multi_line_string: None,
+        polygon: None,
+        multi_polygon: None,
+        }
+    }
 }
 
 
@@ -85,11 +130,22 @@ pub struct Geometry {
 */
 pub struct DisplayConfig {
 
-    stroke: Option<DisplayConfigStroke>,
+    pub stroke: Option<DisplayConfigStroke>,
 
-    fill: Option<DisplayConfigFill>,
+    pub fill: Option<DisplayConfigFill>,
 
-    icon: String,
+    pub icon: Option<String>,
+}
+
+impl DisplayConfig {
+    pub fn new (
+    ) -> Self {
+        Self {
+        stroke: None,
+        fill: None,
+        icon: None,
+        }
+    }
 }
 
 
@@ -98,33 +154,69 @@ pub struct DisplayConfig {
 */
 pub struct Color {
 
-    red: i32,
+    pub red: i32,
 
-    green: i32,
+    pub green: i32,
 
-    blue: i32,
+    pub blue: i32,
 
-    alpha: i32,
+    pub alpha: Option<i32>,
+}
+
+impl Color {
+    pub fn new (
+        red: i32,
+        green: i32,
+        blue: i32,
+    ) -> Self {
+        Self {
+        red: red,
+        green: green,
+        blue: blue,
+        alpha: None,
+        }
+    }
 }
 
 
 
 pub struct DisplayConfigStroke {
 
-    width: i32,
+    pub width: Option<i32>,
 
-    dash_array: Vec<i32>,
+    pub dash_array: Option<Vec<i32>>,
 
-    dash_offset: i32,
+    pub dash_offset: Option<i32>,
 
-    color: Option<Color>,
+    pub color: Option<Color>,
+}
+
+impl DisplayConfigStroke {
+    pub fn new (
+    ) -> Self {
+        Self {
+        width: None,
+        dash_array: None,
+        dash_offset: None,
+        color: None,
+        }
+    }
 }
 
 
 
 pub struct DisplayConfigFill {
 
-    color: Option<Color>,
+    pub color: Option<Color>,
+}
+
+impl DisplayConfigFill {
+    pub fn new (
+    ) -> Self {
+        Self {
+        color: None,
+        }
+    }
 }
 
 

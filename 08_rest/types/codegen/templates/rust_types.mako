@@ -51,9 +51,6 @@
         else:
             ret = '???'
 
-        if (not isRequired) and (not isArray):
-            if isinstance(typeObj, model.EnumType) or hasattr(typeObj, "properties"):
-                ret = "Option<{}>".format(ret)
         if isArray:
             tmpStr = ""
             for i in range(arrayDimensions):
@@ -62,6 +59,8 @@
             for i in range(arrayDimensions):
                 tmpStr = tmpStr + ">"
             ret = tmpStr
+        if (not isRequired):
+            ret = "Option<{}>".format(ret)
         return ret
 
     def getEnumDefaultValue(type):
@@ -124,8 +123,34 @@ pub struct ${type.name} {
             % if property.description != None:
     // ${property.description}
             % endif
-    ${stringUtils.toSnakeCase(property.name)}: ${printRustType(property.type, property.isArray, property.required, property.arrayDimensions)},
+    pub ${stringUtils.toSnakeCase(property.name)}: ${printRustType(property.type, property.isArray, property.required, property.arrayDimensions)},
         % endfor
+}
+
+impl ${type.name} {
+    pub fn new (
+        % for property in type.properties:
+            % if (property.required) and (not property.isArray):
+        ${stringUtils.toSnakeCase(property.name)}: ${printRustType(property.type, property.isArray, property.required, property.arrayDimensions)},
+            % endif
+        % endfor
+    ) -> Self {
+        Self {
+        % for property in type.properties:
+            % if (property.required):
+                % if property.isArray:
+        ${stringUtils.toSnakeCase(property.name)}: Vec::new(),
+                % elif isinstance(property.type, model.DictionaryType):
+        ${stringUtils.toSnakeCase(property.name)}: HashMap::new(),
+                % else:
+        ${stringUtils.toSnakeCase(property.name)}: ${stringUtils.toSnakeCase(property.name)},
+                % endif
+            % else:
+        ${stringUtils.toSnakeCase(property.name)}: None,
+            % endif
+        % endfor
+        }
+    }
 }
 
     % endif
