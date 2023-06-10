@@ -8,6 +8,9 @@
     templateFile = 'rust_types.mako'
     templateVersion = '0.1.0'
 
+    testMod = templateParameters.get('testMod',None)
+    testModPath = templateParameters.get('testModPath',None)
+    
 
 
     def printRustType(typeObj, isArray, isRequired, arrayDimensions = 1):
@@ -107,9 +110,30 @@ use chrono::Duration
         % endif
 pub enum ${type.name} {
         % for value in type.values:
-    ${value},
+    ${stringUtils.toUpperCamelCase(value)},
         % endfor
 }
+
+impl ${type.name} {
+    fn as_str(&self) -> &'static str {
+        match *self {
+        % for value in type.values:
+            ${type.name}::${stringUtils.toUpperCamelCase(value)} => "${value}",
+        % endfor
+        }
+    }
+
+    fn from_str<'a>(s:&'a str) -> Result<${type.name}, &'static str> {
+        match s {
+        % for value in type.values:
+            "${value}" => Ok(${type.name}::${stringUtils.toUpperCamelCase(value)}),
+        % endfor
+            _ => Err("unknown value"),
+        }
+    }
+
+}
+
     % endif
 
     % if hasattr(type, "properties"):
@@ -156,3 +180,11 @@ impl ${type.name} {
     % endif
 
 % endfor
+
+% if testMod is not None:
+#[cfg(test)]
+    % if testModPath is not None:
+#[path = "${testModPath}"]
+    % endif
+mod ${testMod};
+% endif

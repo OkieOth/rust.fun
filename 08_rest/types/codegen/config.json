@@ -18,18 +18,15 @@
                 "name": "types",
                 "singleFileTask": {
                     "template": "/project/codegen/templates/rust_types.mako",
-                    "destFile": "/project/src/layer.rs"
-                }
-            },
-            {
-                "name": "types_tests",
-                "singleFileTask": {
-                    "template": "/project/codegen/templates/rust_types_test.mako",
-                    "destFile": "/project/src/layer_test.txt",
+                    "destFile": "/project/src/layer.rs",
                     "templateParams": [
                         {
-                          "name": "modelPackage",
-                          "value": "layer"
+                          "name": "testMod",
+                          "value": "layer_test"
+                        },
+                        {
+                            "name": "testModPath",
+                            "value": "./layer_test.rs"
                         }
                     ]
                 }

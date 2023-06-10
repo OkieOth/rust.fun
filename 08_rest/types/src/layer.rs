@@ -44,10 +44,31 @@ impl Layer {
 
 
 pub enum LayerDummyEnum {
-    value1,
-    value2,
-    value3,
+    Value1,
+    Value2,
+    Value3,
 }
+
+impl LayerDummyEnum {
+    fn as_str(&self) -> &'static str {
+        match *self {
+            LayerDummyEnum::Value1 => "value1",
+            LayerDummyEnum::Value2 => "value2",
+            LayerDummyEnum::Value3 => "value3",
+        }
+    }
+
+    fn from_str<'a>(s:&'a str) -> Result<LayerDummyEnum, &'static str> {
+        match s {
+            "value1" => Ok(LayerDummyEnum::Value1),
+            "value2" => Ok(LayerDummyEnum::Value2),
+            "value3" => Ok(LayerDummyEnum::Value3),
+            _ => Err("unknown value"),
+        }
+    }
+
+}
+
 
 
 
@@ -228,3 +249,7 @@ impl DisplayConfigFill {
 
 
 
+
+#[cfg(test)]
+#[path = "./layer_test.rs"]
+mod layer_test;
