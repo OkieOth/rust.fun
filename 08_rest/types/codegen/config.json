@@ -30,6 +30,19 @@
                         }
                     ]
                 }
+            },
+            {
+                "name": "types_tests",
+                "singleFileTask": {
+                    "template": "/project/codegen/templates/rust_types_test.mako",
+                    "destFile": "/project/src/layer_test.rs",
+                    "templateParams": [
+                        {
+                          "name": "modelMod",
+                          "value": "layer"
+                        }
+                    ]
+                }
             }
         ]
     }

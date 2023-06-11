@@ -66,20 +66,6 @@
             ret = "Option<{}>".format(ret)
         return ret
 
-    def getEnumDefaultValue(type):
-        if type.default is not None:
-            return secureEnumValues(type.default)
-        else:
-            return secureEnumValues(type.values[0])
-
-    def secureEnumValues(value):
-        pattern = re.compile("^[0-9]")
-        return '_' + value if pattern.match(value) else value
-
-    def isEnumDefaultValue(value, type):
-        return getEnumDefaultValue(type) == secureEnumValues(value)
-
-
 %>// Attention, this file is generated. Manual changes get lost with the next
 // run of the code generation.
 // created by yacg (template: ${templateFile} v${templateVersion})
@@ -135,7 +121,6 @@ impl ${type.name} {
 }
 
     % endif
-
     % if hasattr(type, "properties"):
         % if type.description != None:
 /* ${templateHelper.addLineBreakToDescription(type.description,4)}
@@ -163,14 +148,14 @@ impl ${type.name} {
         % for property in type.properties:
             % if (property.required):
                 % if property.isArray:
-        ${stringUtils.toSnakeCase(property.name)}: Vec::new(),
+            ${stringUtils.toSnakeCase(property.name)}: Vec::new(),
                 % elif isinstance(property.type, model.DictionaryType):
-        ${stringUtils.toSnakeCase(property.name)}: HashMap::new(),
+            ${stringUtils.toSnakeCase(property.name)}: HashMap::new(),
                 % else:
-        ${stringUtils.toSnakeCase(property.name)}: ${stringUtils.toSnakeCase(property.name)},
+            ${stringUtils.toSnakeCase(property.name)}: ${stringUtils.toSnakeCase(property.name)},
                 % endif
             % else:
-        ${stringUtils.toSnakeCase(property.name)}: None,
+            ${stringUtils.toSnakeCase(property.name)}: None,
             % endif
         % endfor
         }

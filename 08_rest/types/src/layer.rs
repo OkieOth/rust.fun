@@ -7,7 +7,6 @@ use serde::Deserialize;
 use uuid::Uuid;
 use std::collections::HashMap;
 
-
 /* A layer definition
 */
 pub struct Layer {
@@ -32,12 +31,12 @@ impl Layer {
         name: String,
     ) -> Self {
         Self {
-        id: id,
-        name: name,
-        min_zoom: None,
-        max_zoom: None,
-        description: None,
-        dummy: None,
+            id: id,
+            name: name,
+            min_zoom: None,
+            max_zoom: None,
+            description: None,
+            dummy: None,
         }
     }
 }
@@ -70,8 +69,6 @@ impl LayerDummyEnum {
 }
 
 
-
-
 /* a feature to display
 */
 pub struct LayerContent {
@@ -95,16 +92,15 @@ impl LayerContent {
         id: Uuid,
     ) -> Self {
         Self {
-        id: id,
-        layer_id: None,
-        projection: None,
-        geometry: None,
-        data: None,
-        display: None,
+            id: id,
+            layer_id: None,
+            projection: None,
+            geometry: None,
+            data: None,
+            display: None,
         }
     }
 }
-
 
 
 /* Geometry definition to display the feature
@@ -133,17 +129,15 @@ impl Geometry {
     pub fn new (
     ) -> Self {
         Self {
-        point: None,
-        multi_point: None,
-        line_string: None,
-        multi_line_string: None,
-        polygon: None,
-        multi_polygon: None,
+            point: None,
+            multi_point: None,
+            line_string: None,
+            multi_line_string: None,
+            polygon: None,
+            multi_polygon: None,
         }
     }
 }
-
-
 
 
 
@@ -162,13 +156,12 @@ impl DisplayConfig {
     pub fn new (
     ) -> Self {
         Self {
-        stroke: None,
-        fill: None,
-        icon: None,
+            stroke: None,
+            fill: None,
+            icon: None,
         }
     }
 }
-
 
 
 /* The color definition to display a feature
@@ -191,14 +184,13 @@ impl Color {
         blue: i32,
     ) -> Self {
         Self {
-        red: red,
-        green: green,
-        blue: blue,
-        alpha: None,
+            red: red,
+            green: green,
+            blue: blue,
+            alpha: None,
         }
     }
 }
-
 
 
 pub struct DisplayConfigStroke {
@@ -216,14 +208,13 @@ impl DisplayConfigStroke {
     pub fn new (
     ) -> Self {
         Self {
-        width: None,
-        dash_array: None,
-        dash_offset: None,
-        color: None,
+            width: None,
+            dash_array: None,
+            dash_offset: None,
+            color: None,
         }
     }
 }
-
 
 
 pub struct DisplayConfigFill {
@@ -235,14 +226,10 @@ impl DisplayConfigFill {
     pub fn new (
     ) -> Self {
         Self {
-        color: None,
+            color: None,
         }
     }
 }
-
-
-
-
 
 
 

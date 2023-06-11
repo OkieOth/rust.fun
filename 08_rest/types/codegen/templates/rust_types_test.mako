@@ -8,148 +8,93 @@
     templateFile = 'golang_types.mako'
     templateVersion = '1.1.0'
 
-    packageName = templateParameters.get('modelPackage','<<PLEASE SET modelPackage TEMPLATE PARAM>>')
+    modelMod = templateParameters.get('modelMod','<<PLEASE SET modelMod TEMPLATE PARAM>>')
 
-
-    def printGolangType(typeObj, isArray, isRequired, arrayDimensions = 1):
-        ret = ''
+    def getTestValue(property):
+        typeObj = property.type
         if typeObj is None:
-            return '???'
+            return f'??? // no type for prop={property.name}'
         elif isinstance(typeObj, model.IntegerType):
             if typeObj.format is None or typeObj.format == model.IntegerTypeFormatEnum.INT32:
-                ret = 'int32'
+                return '42'
             else:
-                ret = 'int'
+                return '42'
         elif isinstance(typeObj, model.ObjectType):
-            ret = 'interface{}'
+            return '{}'
         elif isinstance(typeObj, model.NumberType):
-            if typeObj.format is None or typeObj.format == model.NumberTypeFormatEnum.DOUBLE:
-                ret = 'float64'
+            if typeObj.format is None or typeObj.format != model.NumberTypeFormatEnum.DOUBLE:
+                return '0.42'
             else:
-                ret = 'float32'
+                return '0.42'
         elif isinstance(typeObj, model.BooleanType):
-            ret = 'bool'
+            return 'true'
         elif isinstance(typeObj, model.StringType):
-            ret = 'string'
+            return '"dummy".to_string()'
         elif isinstance(typeObj, model.BytesType):
-            ret = 'byte'
+            return '42'
         elif isinstance(typeObj, model.UuidType):
-            ret = 'uuid.UUID'
+            return 'Uuid::nil()'
         elif isinstance(typeObj, model.EnumType):
-            ret = typeObj.name
+            return f'{typeObj.name}::{stringUtils.toUpperCamelCase(typeObj.values[0])}'
         elif isinstance(typeObj, model.DateType):
-            ret = 'time.Date'
+            return 'Utc::today()'
         elif isinstance(typeObj, model.TimeType):
-            ret = 'time.Time'
+            return '"12:05"'
         elif isinstance(typeObj, model.DateTimeType):
-            ret = 'time.Date'
-        elif isinstance(typeObj, model.DictionaryType):
-            ret = 'map[string]{}'.format(printGolangType(typeObj.valueType, False, True))
-        elif isinstance(typeObj, model.ComplexType):
-            ret = typeObj.name
+            return 'Utc::now()'
+        elif isinstance(typeObj, model.DurationType):
+            return 'Duration::minutes(42)'
         else:
-            ret = '???'
+            return f'??? // unhandled type for prop={property.name}, type={property.type.name}'
 
-        if (not isRequired) and (not isArray):
-            if isinstance(typeObj, model.EnumType) or hasattr(typeObj, "properties"):
-                ret = "Optional{}".format(ret)
-            else:
-                ret = "optional.Optional[{}]".format(ret)
-        if isArray:
-            ret = ("[]" * arrayDimensions) + ret
-        return ret
-
-    def getEnumDefaultValue(type):
-        if type.default is not None:
-            return secureEnumValues(type.default)
+    def printCommaIfNeeded(i, requiredPropList):
+        if i+1 < len(requiredPropList):
+            return ","
         else:
-            return secureEnumValues(type.values[0])
-
-    def secureEnumValues(value):
-        pattern = re.compile("^[0-9]")
-        return '_' + value if pattern.match(value) else value
-
-    def isEnumDefaultValue(value, type):
-        return getEnumDefaultValue(type) == secureEnumValues(value)
-
+            return ""
 
 %>// Attention, this file is generated. Manual changes get lost with the next
 // run of the code generation.
 // created by yacg (template: ${templateFile} v${templateVersion})
-package ${packageName}
 
-
-import (
 % if modelFuncs.isUuidContained(modelTypes):
-    uuid "github.com/google/uuid"
+use uuid::Uuid;
 % endif
-    optional "okieoth/layer-man/pkg/optional_types"
-)
+% if modelFuncs.isTypeContained(modelTypes, model.DictionaryType):
+use std::collections::HashMap;
+% endif
+%if modelFuncs.isTypeContained(modelTypes, model.DateType) or modelFuncs.isTypeContained(modelTypes, model.DateTimeType):
+use chrono::Utc;
+%endif
+%if modelFuncs.isTypeContained(modelTypes, model.DateType):
+use chrono::Date
+%endif
+%if modelFuncs.isTypeContained(modelTypes, model.DateTimeType):
+use chrono::DateTime
+%endif
+%if modelFuncs.isTypeContained(modelTypes, model.DurationType):
+use chrono::Duration
+%endif
+use crate::${modelMod};
+
+
 
 % for type in modelTypes:
-    % if modelFuncs.isEnumType(type):
-        % if type.description != None:
-/* ${templateHelper.addLineBreakToDescription(type.description,4)}
-*/
-        % endif
-type ${type.name} string
-
-const (
-    ${type.name}_${getEnumDefaultValue(type)} ${type.name} = "${getEnumDefaultValue(type)}"
-        % for value in type.values:
-            % if not isEnumDefaultValue(value, type):
-    ${type.name}_${value} = "${value}"
-            % endif
-        % endfor
-)
-
-    % endif
-
     % if hasattr(type, "properties"):
-        % if type.description != None:
-/* ${templateHelper.addLineBreakToDescription(type.description,4)}
-*/
-        % endif
-type ${type.name} struct {
-        % for property in type.properties:
-
-            % if property.description != None:
-    // ${property.description}
-            % endif
-    ${stringUtils.toUpperCamelCase(property.name)} ${printGolangType(property.type, property.isArray, property.required, property.arrayDimensions)}
+<% 
+    requiredPropList = modelFuncs.getRequiredProperties(type) 
+%>
+#[test]
+fn test_${stringUtils.toSnakeCase(type.name)}() {
+        % for i in range(len(requiredPropList)):
+    let ${stringUtils.toSnakeCase(requiredPropList[i].name)} = ${getTestValue(requiredPropList[i])};
         % endfor
+    let l = ${modelMod}::${type.name}::new(
+        % for i in range(len(requiredPropList)):
+        ${stringUtils.toSnakeCase(requiredPropList[i].name)}${printCommaIfNeeded(i, requiredPropList)}
+        % endfor
+    );
 }
-
-// Creates a ${type.name} object
-func Make${type.name}() ${type.name} {
-    var ret ${type.name}
-    // TODO: initialize default values
-    return ret
-}
-
-    % endif
-    % if modelFuncs.isEnumType(type) or hasattr(type, "properties"):
-type Optional${type.name} struct {
-	Value ${type.name}
-	IsSet bool
-}
-
-// Creates a Optional${type.name} object
-func MakeOptional${type.name}() Optional${type.name} {
-    var ret Optional${type.name}
-    // TODO: initialize default values
-    return ret
-}
-
-func (m *Optional${type.name}) Set(v ${type.name}) {
-	m.Value = v
-	m.IsSet = true
-}
-
-func (m *Optional${type.name}) UnSet() {
-	m.IsSet = false
-}
-
     % endif
 
 % endfor
