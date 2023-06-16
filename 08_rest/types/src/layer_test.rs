@@ -13,7 +13,7 @@ use crate::layer;
 fn test_layer() {
     let id = Uuid::nil();
     let name = "dummy".to_string();
-    let l = layer::Layer::new(
+    let _l = layer::Layer::new(
         id,
         name
     );
@@ -24,7 +24,7 @@ fn test_layer() {
 #[test]
 fn test_layer_content() {
     let id = Uuid::nil();
-    let l = layer::LayerContent::new(
+    let _l = layer::LayerContent::new(
         id
     );
 }
@@ -32,7 +32,7 @@ fn test_layer_content() {
 
 #[test]
 fn test_geometry() {
-    let l = layer::Geometry::new(
+    let _l = layer::Geometry::new(
     );
 }
 
@@ -40,7 +40,7 @@ fn test_geometry() {
 
 #[test]
 fn test_display_config() {
-    let l = layer::DisplayConfig::new(
+    let _l = layer::DisplayConfig::new(
     );
 }
 
@@ -50,7 +50,7 @@ fn test_color() {
     let red = 42;
     let green = 42;
     let blue = 42;
-    let l = layer::Color::new(
+    let _l = layer::Color::new(
         red,
         green,
         blue
@@ -60,14 +60,14 @@ fn test_color() {
 
 #[test]
 fn test_display_config_stroke() {
-    let l = layer::DisplayConfigStroke::new(
+    let _l = layer::DisplayConfigStroke::new(
     );
 }
 
 
 #[test]
 fn test_display_config_fill() {
-    let l = layer::DisplayConfigFill::new(
+    let _l = layer::DisplayConfigFill::new(
     );
 }
 

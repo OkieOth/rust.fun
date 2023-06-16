@@ -126,12 +126,14 @@ impl ${type.name} {
 /* ${templateHelper.addLineBreakToDescription(type.description,4)}
 */
         % endif
+#[derive(Debug, Deserialize)]
 pub struct ${type.name} {
         % for property in type.properties:
 
             % if property.description != None:
     // ${property.description}
             % endif
+    #[serde(rename = "${property.name}")]
     pub ${stringUtils.toSnakeCase(property.name)}: ${printRustType(property.type, property.isArray, property.required, property.arrayDimensions)},
         % endfor
 }

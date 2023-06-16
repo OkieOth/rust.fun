@@ -89,7 +89,7 @@ fn test_${stringUtils.toSnakeCase(type.name)}() {
         % for i in range(len(requiredPropList)):
     let ${stringUtils.toSnakeCase(requiredPropList[i].name)} = ${getTestValue(requiredPropList[i])};
         % endfor
-    let l = ${modelMod}::${type.name}::new(
+    let _l = ${modelMod}::${type.name}::new(
         % for i in range(len(requiredPropList)):
         ${stringUtils.toSnakeCase(requiredPropList[i].name)}${printCommaIfNeeded(i, requiredPropList)}
         % endfor

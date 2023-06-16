@@ -1,0 +1,13 @@
+[workspace]
+
+members = [
+    "01_init_tests",
+    "02_permutations",
+    "03_traits",
+    "04_permutations_with_progressbar",
+    "05_json",
+    "06_binary_tree",
+    "07_packages/my-bin",
+    "07_packages/my-lib",
+    "08_rest/types"
+]

@@ -4,14 +4,43 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-    
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug",
-            "program": "${workspaceFolder}/<executable file>",
+            "name": "Debug bin '02_permutations'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=permutations",
+                    "--package=permutations"
+                ],
+                "filter": {
+                    "name": "permutations",
+                    "kind": "bin"
+                },
+                ""
+            },
             "args": [],
-            "cwd": "${workspaceFolder}"
+            "cwd": "${workspaceFolder}/02_permutations"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug tests '02_permutations'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--bin=permutations",
+                    "--package=permutations"
+                ],
+                "filter": {
+                    "name": "permutations",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}/02_permutations"
         }
     ]
 }
