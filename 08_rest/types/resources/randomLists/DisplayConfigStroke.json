@@ -1,0 +1,87 @@
+[
+    {
+        "width": 6936,
+        "dashOffset": 380,
+        "color": {
+            "red": 1688,
+            "green": 9354,
+            "blue": 6169
+        }
+    },
+    {
+        "dashArray": [
+            -5135,
+            6682,
+            8646,
+            -1894
+        ],
+        "color": {
+            "red": -8032,
+            "green": 1193,
+            "blue": -9652,
+            "alpha": -460
+        }
+    },
+    {
+        "dashArray": [
+            -5163,
+            -7105,
+            -7451,
+            7304
+        ],
+        "dashOffset": 1535
+    },
+    {
+        "dashOffset": 2290,
+        "color": {
+            "red": 6175,
+            "green": 7480,
+            "blue": -5611,
+            "alpha": 2155
+        }
+    },
+    {
+        "width": -9175,
+        "dashOffset": 8960,
+        "color": {
+            "red": 8503,
+            "green": -7056,
+            "blue": -8419
+        }
+    },
+    {
+        "width": -368,
+        "dashOffset": -6840,
+        "color": {
+            "red": 6650,
+            "green": -3059,
+            "blue": -4814
+        }
+    },
+    {
+        "dashArray": [
+            -9650,
+            4859
+        ],
+        "dashOffset": 1955
+    },
+    {
+        "width": 8637,
+        "dashArray": [
+            -1354,
+            -5652,
+            3819,
+            -9204
+        ],
+        "dashOffset": -1523
+    },
+    {
+        "dashOffset": -499,
+        "color": {
+            "red": -5294,
+            "green": -2234,
+            "blue": -8323,
+            "alpha": -2949
+        }
+    }
+]

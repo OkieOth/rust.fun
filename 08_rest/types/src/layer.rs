@@ -28,7 +28,7 @@ pub struct Layer {
     pub description: Option<String>,
 
     // this attrib has no real value, it's only there to challenge the enum handling
-    #[serde(rename = "dummy")]
+    #[serde(rename = "dummyEnum")]
     pub dummy: Option<LayerDummyEnum>,
 }
 
@@ -414,3 +414,7 @@ mod layer_test;
 #[cfg(test)]
 #[path = "./layer_json_test.rs"]
 mod layer_json_test;
+
+#[cfg(test)]
+#[path = "./layer_json_test_static.rs"]
+mod layer_json_test_static;
