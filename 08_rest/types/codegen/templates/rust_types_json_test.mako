@@ -5,7 +5,7 @@
     import yacg.model.modelFuncs as modelFuncs
     import yacg.util.stringUtils as stringUtils
 
-    templateFile = 'rust_types_test.mako'
+    templateFile = 'rust_types_json_test.mako'
     templateVersion = '1.1.0'
 
     modelMod = templateParameters.get('modelMod','<<PLEASE SET modelMod TEMPLATE PARAM>>')
@@ -76,6 +76,7 @@ use chrono::DateTime
 use chrono::Duration
 %endif
 use crate::${modelMod};
+use serde_json;
 
 
 
@@ -85,15 +86,19 @@ use crate::${modelMod};
     requiredPropList = modelFuncs.getRequiredProperties(type) 
 %>
 #[test]
-fn test_${stringUtils.toSnakeCase(type.name)}() {
+fn test_json_${stringUtils.toSnakeCase(type.name)}() {
         % for i in range(len(requiredPropList)):
     let ${stringUtils.toSnakeCase(requiredPropList[i].name)} = ${getTestValue(requiredPropList[i])};
         % endfor
-    let _l = ${modelMod}::${type.name}::new(
+    let first = ${modelMod}::${type.name}::new(
         % for i in range(len(requiredPropList)):
         ${stringUtils.toSnakeCase(requiredPropList[i].name)}${printCommaIfNeeded(i, requiredPropList)}
         % endfor
     );
+    let json_string = serde_json::to_string(&first).expect("Failed to serialize object to JSON");
+    let second: ${modelMod}::${type.name} =
+        serde_json::from_str(&json_string).expect("Failed to deserialize JSON to object");
+    assert_eq!(first, second);
 }
     % endif
 

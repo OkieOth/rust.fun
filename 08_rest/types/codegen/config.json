@@ -43,6 +43,19 @@
                         }
                     ]
                 }
+            },
+            {
+                "name": "types_json_tests",
+                "singleFileTask": {
+                    "template": "/project/codegen/templates/rust_types_json_test.mako",
+                    "destFile": "/project/src/layer_json_test.rs",
+                    "templateParams": [
+                        {
+                          "name": "modelMod",
+                          "value": "layer"
+                        }
+                    ]
+                }
             }
         ]
     }

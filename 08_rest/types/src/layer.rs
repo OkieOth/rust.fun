@@ -412,5 +412,5 @@ impl DisplayConfigFill {
 mod layer_test;
 
 #[cfg(test)]
-#[path = "./layer_json_test_static.rs"]
-mod layer_json_test_static;
+#[path = "./layer_json_test.rs"]
+mod layer_json_test;

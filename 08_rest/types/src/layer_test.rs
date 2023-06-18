@@ -1,6 +1,6 @@
 // Attention, this file is generated. Manual changes get lost with the next
 // run of the code generation.
-// created by yacg (template: golang_types.mako v1.1.0)
+// created by yacg (template: rust_types_test.mako v1.1.0)
 
 use uuid::Uuid;
 use std::collections::HashMap;
