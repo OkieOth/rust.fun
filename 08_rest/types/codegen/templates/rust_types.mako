@@ -9,8 +9,10 @@
     templateVersion = '0.1.0'
 
     testMod = templateParameters.get('testMod',None)
-    testModPath = templateParameters.get('testModPath',None)
-    
+    testModPath = f"./{testMod}.rs"
+    testJsonMod = templateParameters.get('testJsonMod',None)
+    testJsonModPath = f"./{testJsonMod}.rs"
+
 
 
     def printRustType(typeObj, isArray, isRequired, arrayDimensions = 1):
@@ -71,7 +73,7 @@
 // created by yacg (template: ${templateFile} v${templateVersion})
 
 use serde_json;
-use serde::Deserialize;
+use serde::{Serialize, Deserialize};
 % if modelFuncs.isUuidContained(modelTypes):
 use uuid::Uuid;
 % endif
@@ -94,6 +96,7 @@ use chrono::Duration
 /* ${templateHelper.addLineBreakToDescription(type.description,4)}
 */
         % endif
+#[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub enum ${type.name} {
         % for value in type.values:
     ${stringUtils.toUpperCamelCase(value)},
@@ -126,7 +129,7 @@ impl ${type.name} {
 /* ${templateHelper.addLineBreakToDescription(type.description,4)}
 */
         % endif
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct ${type.name} {
         % for property in type.properties:
 
@@ -136,6 +139,17 @@ pub struct ${type.name} {
     #[serde(rename = "${property.name}")]
     pub ${stringUtils.toSnakeCase(property.name)}: ${printRustType(property.type, property.isArray, property.required, property.arrayDimensions)},
         % endfor
+}
+
+impl PartialEq for ${type.name} {
+    fn eq(&self, other: &Self) -> bool {
+        % for property in type.properties:
+        if self.${stringUtils.toSnakeCase(property.name)} != other.${stringUtils.toSnakeCase(property.name)} {
+            return false;
+        }
+        % endfor
+        return true;
+    }
 }
 
 impl ${type.name} {
@@ -170,8 +184,12 @@ impl ${type.name} {
 
 % if testMod is not None:
 #[cfg(test)]
-    % if testModPath is not None:
 #[path = "${testModPath}"]
-    % endif
 mod ${testMod};
+% endif
+
+% if testJsonMod is not None:
+#[cfg(test)]
+#[path = "${testJsonModPath}"]
+mod ${testJsonMod};
 % endif

@@ -3,7 +3,7 @@
 // created by yacg (template: rust_types.mako v0.1.0)
 
 use serde_json;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 use uuid::Uuid;
 use std::collections::HashMap;
 
@@ -32,6 +32,30 @@ pub struct Layer {
     pub dummy: Option<LayerDummyEnum>,
 }
 
+impl PartialEq for Layer {
+    fn eq(&self, other: &Self) -> bool {
+        if self.id != other.id {
+            return false;
+        }
+        if self.name != other.name {
+            return false;
+        }
+        if self.min_zoom != other.min_zoom {
+            return false;
+        }
+        if self.max_zoom != other.max_zoom {
+            return false;
+        }
+        if self.description != other.description {
+            return false;
+        }
+        if self.dummy != other.dummy {
+            return false;
+        }
+        return true;
+    }
+}
+
 impl Layer {
     pub fn new (
         id: Uuid,
@@ -49,7 +73,7 @@ impl Layer {
 }
 
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub enum LayerDummyEnum {
     Value1,
     Value2,
@@ -79,7 +103,7 @@ impl LayerDummyEnum {
 
 /* a feature to display
 */
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct LayerContent {
 
     #[serde(rename = "id")]
@@ -102,6 +126,30 @@ pub struct LayerContent {
     pub display: Option<DisplayConfig>,
 }
 
+impl PartialEq for LayerContent {
+    fn eq(&self, other: &Self) -> bool {
+        if self.id != other.id {
+            return false;
+        }
+        if self.layer_id != other.layer_id {
+            return false;
+        }
+        if self.projection != other.projection {
+            return false;
+        }
+        if self.geometry != other.geometry {
+            return false;
+        }
+        if self.data != other.data {
+            return false;
+        }
+        if self.display != other.display {
+            return false;
+        }
+        return true;
+    }
+}
+
 impl LayerContent {
     pub fn new (
         id: Uuid,
@@ -120,7 +168,7 @@ impl LayerContent {
 
 /* Geometry definition to display the feature
 */
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Geometry {
 
     #[serde(rename = "point")]
@@ -147,6 +195,30 @@ pub struct Geometry {
     pub multi_polygon: Option<Vec<Vec<Vec<Vec<f32>>>>>,
 }
 
+impl PartialEq for Geometry {
+    fn eq(&self, other: &Self) -> bool {
+        if self.point != other.point {
+            return false;
+        }
+        if self.multi_point != other.multi_point {
+            return false;
+        }
+        if self.line_string != other.line_string {
+            return false;
+        }
+        if self.multi_line_string != other.multi_line_string {
+            return false;
+        }
+        if self.polygon != other.polygon {
+            return false;
+        }
+        if self.multi_polygon != other.multi_polygon {
+            return false;
+        }
+        return true;
+    }
+}
+
 impl Geometry {
     pub fn new (
     ) -> Self {
@@ -165,7 +237,7 @@ impl Geometry {
 
 /* Optional configuration to display a feature
 */
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct DisplayConfig {
 
     #[serde(rename = "stroke")]
@@ -176,6 +248,21 @@ pub struct DisplayConfig {
 
     #[serde(rename = "icon")]
     pub icon: Option<String>,
+}
+
+impl PartialEq for DisplayConfig {
+    fn eq(&self, other: &Self) -> bool {
+        if self.stroke != other.stroke {
+            return false;
+        }
+        if self.fill != other.fill {
+            return false;
+        }
+        if self.icon != other.icon {
+            return false;
+        }
+        return true;
+    }
 }
 
 impl DisplayConfig {
@@ -192,7 +279,7 @@ impl DisplayConfig {
 
 /* The color definition to display a feature
 */
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Color {
 
     #[serde(rename = "red")]
@@ -206,6 +293,24 @@ pub struct Color {
 
     #[serde(rename = "alpha")]
     pub alpha: Option<i32>,
+}
+
+impl PartialEq for Color {
+    fn eq(&self, other: &Self) -> bool {
+        if self.red != other.red {
+            return false;
+        }
+        if self.green != other.green {
+            return false;
+        }
+        if self.blue != other.blue {
+            return false;
+        }
+        if self.alpha != other.alpha {
+            return false;
+        }
+        return true;
+    }
 }
 
 impl Color {
@@ -224,7 +329,7 @@ impl Color {
 }
 
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct DisplayConfigStroke {
 
     #[serde(rename = "width")]
@@ -240,6 +345,24 @@ pub struct DisplayConfigStroke {
     pub color: Option<Color>,
 }
 
+impl PartialEq for DisplayConfigStroke {
+    fn eq(&self, other: &Self) -> bool {
+        if self.width != other.width {
+            return false;
+        }
+        if self.dash_array != other.dash_array {
+            return false;
+        }
+        if self.dash_offset != other.dash_offset {
+            return false;
+        }
+        if self.color != other.color {
+            return false;
+        }
+        return true;
+    }
+}
+
 impl DisplayConfigStroke {
     pub fn new (
     ) -> Self {
@@ -253,11 +376,20 @@ impl DisplayConfigStroke {
 }
 
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct DisplayConfigFill {
 
     #[serde(rename = "color")]
     pub color: Option<Color>,
+}
+
+impl PartialEq for DisplayConfigFill {
+    fn eq(&self, other: &Self) -> bool {
+        if self.color != other.color {
+            return false;
+        }
+        return true;
+    }
 }
 
 impl DisplayConfigFill {
@@ -280,5 +412,5 @@ impl DisplayConfigFill {
 mod layer_test;
 
 #[cfg(test)]
-#[path = "./layer_json_test.rs"]
-mod layer_json_test;
+#[path = "./layer_json_test_static.rs"]
+mod layer_json_test_static;

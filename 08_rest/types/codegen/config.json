@@ -25,10 +25,10 @@
                           "value": "layer_test"
                         },
                         {
-                            "name": "testModPath",
-                            "value": "./layer_test.rs"
+                            "name": "testJsonMod",
+                            "value": "layer_json_test"
                         }
-                    ]
+                      ]
                 }
             },
             {

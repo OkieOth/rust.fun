@@ -16,14 +16,15 @@ fn test_dummy() {
     // Serialize the object to a JSON string
     let json_string = serde_json::to_string(&layer).expect("Failed to serialize object to JSON");
 
-    println!("Serialized JSON:\n{}", json_string);
-
     // Deserialize the JSON string back to an object
-    let deserialized_layer: layer::Layer =
+    let mut deserialized_layer: layer::Layer =
         serde_json::from_str(&json_string).expect("Failed to deserialize JSON to object");
 
-    println!("Deserialized Object:\n{:?}", deserialized_layer);
+    assert_eq!(layer, deserialized_layer);
 
+    deserialized_layer.name = "schnulli".to_string();
+
+    assert_ne!(layer, deserialized_layer);
 }
 
 
