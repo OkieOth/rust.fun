@@ -214,7 +214,7 @@ fn factorial(n: usize) -> usize {
 #[test]
 fn test_permutations() {
 	let input = create_permutation_entry(4);    
-	let permutations_vector = permutations(&input);
+	let permutations_vector = permutations2(&input);
     assert_eq!(permutations_vector.len(), 24)
 }
 

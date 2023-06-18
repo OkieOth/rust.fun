@@ -3,6 +3,7 @@ use std::fs::File;
 use std::io::{BufReader, BufRead};
 use std::collections::HashMap;
 use std::any::type_name;
+use std::path::Path;
 use serde_json;
 use serde::Deserialize;
 use uuid::Uuid;
@@ -94,13 +95,28 @@ fn read_file_with_buffer(file_name: &str) -> std::io::Result<()> {
 
 
 fn main() ->  std::io::Result<()> {
-    let file_name = "resources/yacg_model_schema.json";
+    let file_name = match Path::new("./05_json").is_dir() {
+        true => "./05_json/resources/yacg_model_schema.json",
+        false => "resources/yacg_model_schema.json",
+    }; 
     read_file_as_string(file_name).expect("error in read_file_as_string");
-    let file_name2 = "resources/simple.json";
+
+    let file_name2 = match Path::new("./05_json").is_dir() {
+        true => "./05_json/resources/simple.json",
+        false => "resources/simple.json",
+    }; 
     read_file_with_buffer(file_name2).expect("error in read_file_with_buffer");
-    let file_name3 = "resources/simple2.json";
+
+    let file_name3 = match Path::new("./05_json").is_dir() {
+        true => "./05_json/resources/simple2.json",
+        false => "resources/simple2.json",
+    }; 
     read_file_with_buffer(file_name3).expect("error in read_file_with_buffer");
-    let file_name4 = "resources/simple2222.json";
+
+    let file_name4 = match Path::new("./05_json").is_dir() {
+        true => "./05_json/resources/simple2222.json",
+        false => "resources/simple2222.json",
+    }; 
     match read_file_as_string(file_name4) {
         Ok(_) => println!("Would have expect an error in reading not existing files :-/"),
         Err(_) => println!("Got expected error :)"),

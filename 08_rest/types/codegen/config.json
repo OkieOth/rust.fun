@@ -27,6 +27,10 @@
                         {
                             "name": "testJsonMod",
                             "value": "layer_json_test"
+                        },
+                        {
+                            "name": "testManualMod",
+                            "value": "layer_manual_tests"
                         }
                       ]
                 }

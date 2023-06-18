@@ -12,6 +12,8 @@
     testModPath = f"./{testMod}.rs"
     testJsonMod = templateParameters.get('testJsonMod',None)
     testJsonModPath = f"./{testJsonMod}.rs"
+    testManualMod = templateParameters.get('testManualMod',None)
+    testManualModPath = f"./{testManualMod}.rs"
 
 
 
@@ -99,6 +101,7 @@ use chrono::Duration
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub enum ${type.name} {
         % for value in type.values:
+    #[serde(rename = "${value}")]
     ${stringUtils.toUpperCamelCase(value)},
         % endfor
 }
@@ -192,4 +195,10 @@ mod ${testMod};
 #[cfg(test)]
 #[path = "${testJsonModPath}"]
 mod ${testJsonMod};
+% endif
+
+% if testManualMod is not None:
+#[cfg(test)]
+#[path = "${testManualModPath}"]
+mod ${testManualMod};
 % endif

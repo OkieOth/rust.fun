@@ -41,8 +41,8 @@ pub mod bt {
 
     pub struct BinaryTree<T: std::cmp::PartialOrd> {
         // root node of the binary tree
-        root: Option<Box<BinaryTreeNode<T>>>,
-        node_count: usize,
+        pub root: Option<Box<BinaryTreeNode<T>>>,
+        pub node_count: usize,
     }
 
     impl<T: std::cmp::PartialOrd> BinaryTree<T> {
@@ -84,25 +84,21 @@ pub mod bt {
 }
 
 #[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn createBinaryTree() {
-        let mut bt = BinaryTree::new();
-        assert!(bt.root.is_none());
-        assert_eq!(bt.node_count, 0);
-        assert!(bt.insert(10));
-        assert!(bt.root.is_some());
-        assert_eq!(bt.node_count, 1);
-        assert!(bt.insert(1));
-        assert!(bt.root.is_some());
-        assert_eq!(bt.node_count, 2);
-        assert!(bt.insert(5));
-        assert!(bt.root.is_some());
-        assert_eq!(bt.node_count, 3);
-        assert!(!bt.insert(5));
-        assert!(bt.root.is_some());
-        assert_eq!(bt.node_count, 3);
-    }
+#[test]
+fn createBinaryTree() {
+    let mut bt = bt::BinaryTree::new();
+    assert!(bt.root.is_none());
+    assert_eq!(bt.node_count, 0);
+    assert!(bt.insert(10));
+    assert!(bt.root.is_some());
+    assert_eq!(bt.node_count, 1);
+    assert!(bt.insert(1));
+    assert!(bt.root.is_some());
+    assert_eq!(bt.node_count, 2);
+    assert!(bt.insert(5));
+    assert!(bt.root.is_some());
+    assert_eq!(bt.node_count, 3);
+    assert!(!bt.insert(5));
+    assert!(bt.root.is_some());
+    assert_eq!(bt.node_count, 3);
 }
