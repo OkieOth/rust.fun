@@ -57,6 +57,14 @@
                         {
                           "name": "modelMod",
                           "value": "layer"
+                        },
+                        {
+                            "name": "testJsonObjFileSrc",
+                            "value": "resources/randomObj"
+                        },
+                        {
+                            "name": "testJsonListFileSrc",
+                            "value": "resources/randomLists"
                         }
                     ]
                 }
