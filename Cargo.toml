@@ -9,5 +9,7 @@ members = [
     "06_binary_tree",
     "07_packages/my-bin",
     "07_packages/my-lib",
-    "08_rest/types"
+    "08_rest/types",
+    "08_rest/server",
+    "09_permutations_async"
 ]

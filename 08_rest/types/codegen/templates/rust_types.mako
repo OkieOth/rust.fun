@@ -74,7 +74,6 @@
 // run of the code generation.
 // created by yacg (template: ${templateFile} v${templateVersion})
 
-use serde_json;
 use serde::{Serialize, Deserialize};
 % if modelFuncs.isUuidContained(modelTypes):
 use uuid::Uuid;

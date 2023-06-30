@@ -2,7 +2,6 @@
 // run of the code generation.
 // created by yacg (template: rust_types.mako v0.1.0)
 
-use serde_json;
 use serde::{Serialize, Deserialize};
 use uuid::Uuid;
 use std::collections::HashMap;
