@@ -11,5 +11,6 @@ members = [
     "07_packages/my-lib",
     "08_rest/types",
     "08_rest/server",
-    "09_permutations_async"
+    "09_permutations_async",
+    "10_logging"
 ]
