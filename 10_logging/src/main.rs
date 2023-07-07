@@ -11,12 +11,12 @@ use env_logger::filter::{Builder, Filter};
 #[macro_use]
 extern crate log;
 
+use env_logger::Env;
+
 enum Direction {
     UP,
     DOWN
 }
-
-
 
 fn change_sleep_seconds(direction: Direction, current_sleep_seconds: u64) -> (u64, Direction) {
     match direction {
@@ -37,47 +37,6 @@ fn change_sleep_seconds(direction: Direction, current_sleep_seconds: u64) -> (u6
     }
 }
 
-const FILTER_ENV: &str = "MY_LOG_LEVEL";
-
-struct MyLogger {
-    inner: Filter,
-}
-
-fn create_logger() -> Result<Box<&Filter>, SetLoggerError> {
-    let l = MyLogger::new();
-    log::set_max_level(l.inner.filter());
-    match log::set_boxed_logger(Box::new(l)) {
-        Ok(()) => Ok(Box::new(&l.inner)),
-        Err(x) => Err(x),
-    }
-}
-
-impl MyLogger {
-    fn new() -> MyLogger {
-        //let mut builder = Builder::from_env(FILTER_ENV);
-        let mut builder = Builder::new();
-
-        let filter = builder.filter(None, LevelFilter::Debug).build();
-        MyLogger {
-            inner: filter
-        }
-    }
-}
-
-impl Log for MyLogger {
-    fn enabled(&self, metadata: &Metadata) -> bool {
-        self.inner.enabled(metadata)
-    }
-
-    fn log(&self, record: &Record) {
-        // Check if the record is matched by the logger before logging
-        if self.inner.matches(record) {
-            println!("{} - {}", record.level(), record.args());
-        }
-    }
-
-    fn flush(&self) {}
-}
 
 fn main() -> Result<(), Error> {
     let mut run = 1;
@@ -85,13 +44,17 @@ fn main() -> Result<(), Error> {
     let mut sleep_seconds = 5;
     let mut sleep_time = time::Duration::from_secs(sleep_seconds);
 
-    create_logger();
+    let env = Env::default()
+    .filter_or("MY_LOG_LEVEL", "trace");
+
+env_logger::init_from_env(env);
     println!("My pid is {}", process::id());
 
     // channel to communicate between the signal handler the endless loop
     let (tx, rx) = mpsc::channel();
     thread::spawn(move || {
         let mut direction_sleep = Direction::UP;
+        let mut log_level_error = false;
         for sig in signals.forever() {
             match sig {
                 SIGUSR1 => {
@@ -102,7 +65,15 @@ fn main() -> Result<(), Error> {
                 },
                 SIGUSR2 => {
                     debug!("Received SIGUSR2: reload logger config");
-
+                    if log_level_error {
+                        log_level_error = false;
+                        log::set_max_level(LevelFilter::Debug);
+                        info!("log-level is DEBUG");
+                    } else {
+                        log_level_error = true;
+                        log::set_max_level(LevelFilter::Error);
+                        error!("log-level is ERROR");
+                    }
                 },
                 _ => {
                     error!("Received other signal :-/ {:?}", sig);
@@ -110,6 +81,15 @@ fn main() -> Result<(), Error> {
             }
         }
     }); 
+    thread::spawn(move || {
+        loop {
+            trace!("Test-Trace");
+            debug!("Test-Debug");
+            info!("Test-Info");
+            error!("Test-Error");
+            thread::sleep(time::Duration::from_secs(2));
+        }
+    });
     loop {
 
         println!("Hello, world! ({})", run);
