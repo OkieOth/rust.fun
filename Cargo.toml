@@ -12,5 +12,6 @@ members = [
     "08_rest/types",
     "08_rest/server",
     "09_permutations_async",
-    "10_logging"
+    "10_logging",
+    "11_permutations_func"
 ]
