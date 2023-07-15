@@ -1,6 +1,16 @@
 use clap::Parser;
 
 use clap::{Args, Subcommand};
+use lapin::{
+    message::DeliveryResult,
+    options::{BasicAckOptions, BasicConsumeOptions, BasicPublishOptions, QueueDeclareOptions},
+    types::FieldTable,
+    BasicProperties, Connection, ConnectionProperties,
+};
+
+use tokio_executor_trait;
+use tokio_reactor_trait;
+
 
 // https://rust-cli-recommendations.sunshowers.io/handling-arguments.html
 
@@ -67,7 +77,7 @@ struct GlobalOpts {
     routing_key: String,
 
     /// Connection string
-    #[clap(long, short)]
+    #[clap(long, short, default_value = "amqp://localhost:5672")]
     connection: String,
 
     /// User name to authenticate
@@ -79,7 +89,8 @@ struct GlobalOpts {
     password: String,
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let parser = App::parse();
     match parser.command {
         Command::Subscriber(_args) => {
@@ -90,3 +101,14 @@ fn main() {
         },
     }
 }
+
+async fn get_connection<'a> (user: &'a String, password: &'a String, connection: &'a String) -> Connection {
+    let options = ConnectionProperties::default()
+        // Use tokio executor and reactor.
+        // At the moment the reactor is only available for unix.
+        .with_executor(tokio_executor_trait::Tokio::current())
+        .with_reactor(tokio_reactor_trait::Tokio);
+
+    Connection::connect(connection, options).await.unwrap()
+}
+

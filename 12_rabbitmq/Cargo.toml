@@ -7,3 +7,9 @@ edition = "2021"
 
 [dependencies]
 clap = { version = "4.3.0", features = ["derive"] }
+lapin = { version ="2.2.1", features = [] }
+tokio = { version = "1.28.2", features = ["full"] }
+tokio-executor = "0.1.10"
+tokio-executor-trait = "2.1.1"
+tokio-reactor = "0.1.12"
+tokio-reactor-trait = "1.1.0"
