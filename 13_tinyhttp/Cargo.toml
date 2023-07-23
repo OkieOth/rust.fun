@@ -5,5 +5,17 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+
+[lib]
+name = "my_http_impl"
+path = "src/lib/lib.rs"
+crate-type = ["lib"]
+
+[[bin]]
+name = "my_http_server"
+path = "src/bin/main.rs"
+
 [dependencies]
 tiny_http = "0.12.0"
+clap = { version = "4.3.0", features = ["derive"] }
+ureq = "2.7.1"
