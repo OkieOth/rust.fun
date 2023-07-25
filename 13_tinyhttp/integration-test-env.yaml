@@ -1,0 +1,23 @@
+version: '3'
+services:
+  my_http_server:
+    command: [ "./my_http_server", "-t", "10" ]
+    build:
+      context: .
+      dockerfile: Dockerfile.app
+    ports:
+      - "8080:8080"   # AMQP port
+    networks:
+      - test_network
+
+  test_runner:
+    build:
+      context: .
+      dockerfile: Dockerfile.testrunner
+    depends_on:
+      - my_http_server
+    networks:
+      - test_network
+networks:
+  test_network:
+    driver: bridge

@@ -1,0 +1,9 @@
+FROM rust:latest as build
+
+WORKDIR /usr/src/app
+
+COPY . .
+
+RUN cargo test
+
+CMD ["cargo", "test", "docker", "--", "--ignored"]
