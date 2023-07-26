@@ -20,3 +20,6 @@ path = "src/bin/main.rs"
 tiny_http = "0.12.0"
 clap = { version = "4.3.0", features = ["derive"] }
 ureq = "2.7.1"
+env_logger = "0.10.0"
+log = "0.4.19"
+regex = "1.9.1"

@@ -1,6 +1,15 @@
 use clap::Parser;
+use tiny_http::{Request, Response};
 use std::sync::Arc;
 use std::thread;
+use std::io::{Cursor};
+use regex::{Regex, Captures};
+use log::{error, info, debug, LevelFilter, Log, Metadata, Record, SetLoggerError};
+
+#[macro_use]
+extern crate log;
+
+use env_logger::Env;
 
 
 /// small http server.
@@ -26,6 +35,43 @@ pub struct Args {
     pub threads: usize,
 }
 
+fn handle_request(i: usize, request_count: usize) -> Response<Cursor<Vec<u8>>> {
+    trace!("Test-Trace: thread-{}, request_count={}", i, request_count);
+    debug!("Test-Debug: thread-{}, request_count={}", i, request_count);
+    info!("Test-Info: thread-{}, request_count={}", i, request_count);
+    warn!("Test-Warn: thread-{}, request_count={}", i, request_count);
+    error!("Test-Error: thread-{}, request_count={}", i, request_count);
+    let response_text = format!("hello world [thread #{}, request #{}]", i, request_count);
+    tiny_http::Response::from_string(response_text)
+}
+
+fn set_log_level(captures: &Captures) -> Response<Cursor<Vec<u8>>> {
+    let log_level = captures.get(1).unwrap().as_str();
+    match log_level {
+        "error" => {
+            log::set_max_level(LevelFilter::Error);
+            warn!("set log-level to ERROR");
+        },
+        "warn" => {
+            log::set_max_level(LevelFilter::Warn);
+            warn!("set log-level to WARN");
+        },
+        "info" => {
+            log::set_max_level(LevelFilter::Info);
+            warn!("set log-level INFO");
+        },
+        "debug" => {
+            log::set_max_level(LevelFilter::Debug);
+            warn!("set log-level DEBUG");
+        },
+        "trace" => {
+            log::set_max_level(LevelFilter::Trace);
+            warn!("set log-level TRACE");
+        },
+        _ => error!("receive wish to switch to unknown log-level: {}", log_level)
+    }
+    tiny_http::Response::from_string("new log-level set")
+}
 
 pub fn run_server<'a> (args: &'a Args) {
     let max_request_count = args.count;
@@ -33,7 +79,12 @@ pub fn run_server<'a> (args: &'a Args) {
     let port = args.port;
     let server_addr = format!("{}:{}", addr, port);
     let server = Arc::new(tiny_http::Server::http(server_addr).unwrap());
-    println!("Server is bind to {} and listens on port {}", addr, port);
+
+    let env = Env::default().filter_or("LOG_LEVEL", "info");
+    env_logger::init_from_env(env);
+
+
+    info!("Server is bind to {} and listens on port {}, max_request_count={}", addr, port, max_request_count);
 
     let mut handles = Vec::new();
 
@@ -41,24 +92,33 @@ pub fn run_server<'a> (args: &'a Args) {
         let server = server.clone();
 
         handles.push(thread::spawn(move || {
-            println!("Thread-{} is waiting", i);
+            debug!("Thread-{} is waiting", i);
+            let re = Regex::new(r"/log-level/(.*)$").unwrap();
             let mut request_count: usize = 0;
             for rq in server.incoming_requests() {
-                request_count += 1;
-                let response_text = format!("hello world [thread #{}, request #{}]", i, request_count);
-                let response = tiny_http::Response::from_string(response_text);
-                let _ = rq.respond(response);
-                if (max_request_count > 0) && (request_count == max_request_count) {
-                    break;
+                let url = rq.url();
+                info!("got request for: {}",url);
+                match re.captures(url) {
+                    Some(captures) => {
+                        let r = set_log_level(&captures);
+                        let _ = rq.respond(r);
+                    },
+                    None => {
+                        request_count += 1;
+                        let _ = rq.respond(handle_request(i, request_count));
+                        if (max_request_count > 0) && (request_count == max_request_count) {
+                            break;
+                        }
+                    }
                 }
             }
-            println!("Thread-{} is terminating", i);
+            debug!("Thread-{} is terminating", i);
         }));
     }
 
-    println!("waiting for threads to terminate");
+    debug!("waiting for threads to terminate");
     for h in handles {
         h.join().unwrap();
     }
-    println!("all threads are done :)");
+    debug!("all threads are done :)");
 }

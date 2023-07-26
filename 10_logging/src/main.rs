@@ -47,7 +47,7 @@ fn main() -> Result<(), Error> {
     let env = Env::default()
     .filter_or("MY_LOG_LEVEL", "trace");
 
-env_logger::init_from_env(env);
+    env_logger::init_from_env(env);
     println!("My pid is {}", process::id());
 
     // channel to communicate between the signal handler the endless loop
