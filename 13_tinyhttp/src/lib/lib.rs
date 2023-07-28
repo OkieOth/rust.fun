@@ -1,10 +1,10 @@
 use clap::Parser;
-use tiny_http::{Request, Response};
+use tiny_http::{Response};
 use std::sync::Arc;
 use std::thread;
 use std::io::{Cursor};
 use regex::{Regex, Captures};
-use log::{error, info, debug, LevelFilter, Log, Metadata, Record, SetLoggerError};
+use log::{error, info, debug, LevelFilter};
 
 #[macro_use]
 extern crate log;
@@ -81,7 +81,9 @@ pub fn run_server<'a> (args: &'a Args) {
     let server = Arc::new(tiny_http::Server::http(server_addr).unwrap());
 
     let env = Env::default().filter_or("LOG_LEVEL", "info");
-    env_logger::init_from_env(env);
+    if env_logger::try_init_from_env(env).is_err() {
+        error!("seems logger is already initialized")
+    }
 
 
     info!("Server is bind to {} and listens on port {}, max_request_count={}", addr, port, max_request_count);

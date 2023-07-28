@@ -4,6 +4,8 @@ services:
     command: [ "./my_http_server", "-t", "10" ]
     build:
       context: .
+      args:
+        DOCKER_BUILDKIT: 1
       dockerfile: Dockerfile.app
     ports:
       - "8080:8080"   # AMQP port
@@ -13,6 +15,8 @@ services:
   test_runner:
     build:
       context: .
+      args:
+        DOCKER_BUILDKIT: 1
       dockerfile: Dockerfile.testrunner
     depends_on:
       - my_http_server
