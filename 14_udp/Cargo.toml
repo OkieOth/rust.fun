@@ -1,23 +1,20 @@
 [package]
-name = "rabbitmq-test"
+name = "udp"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [lib]
-name = "rabbit_client_impl"
+name = "my_udp_worker_impl"
 path = "src/lib/lib.rs"
 crate-type = ["lib"]
 
 [[bin]]
-name = "my_rabbit_client"
+name = "my_udp_worker"
 path = "src/bin/main.rs"
 
-
 [dependencies]
-amqprs = "1.4.0"
 clap = { version = "4.3.0", features = ["derive"] }
 env_logger = "0.10.0"
 log = "0.4.19"
 tokio = "1.29.1"
+

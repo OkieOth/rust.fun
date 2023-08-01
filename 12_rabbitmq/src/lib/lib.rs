@@ -1,5 +1,6 @@
 use clap::{Args};
 
+
 #[derive(Debug, Args)]
 pub struct PublisherArgs {
     /// Number of parallel publishings

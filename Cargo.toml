@@ -16,4 +16,5 @@ members = [
     "11_permutations_func",
     "12_rabbitmq",
     "13_tinyhttp",
+    "14_udp",
 ]

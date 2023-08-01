@@ -16,7 +16,7 @@ use env_logger::Env;
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 pub struct Args {
-    /// Number of digits for the permutations
+    /// Port to listen
     #[arg(short, long, default_value_t = 8080)]
     pub port: usize,
 

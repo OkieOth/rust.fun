@@ -3,15 +3,7 @@ use log::{error, info, debug, LevelFilter};
 use clap::Parser;
 
 use clap::{Subcommand};
-// use lapin::{
-//     message::DeliveryResult,
-//     options::{BasicAckOptions, BasicConsumeOptions, BasicPublishOptions, QueueDeclareOptions},
-//     types::FieldTable,
-//     BasicProperties, Connection, ConnectionProperties,
-// };
 
-use tokio_executor_trait;
-use tokio_reactor_trait;
 
 use rabbit_client_impl::{SubscriberArgs, PublisherArgs, start_publisher, start_subscriber};
 
@@ -37,7 +29,7 @@ enum Command {
 }
 
 
-#[tokio::main]
+#[tokio::main(flavor = "multi_thread", worker_threads = 2)]
 async fn main() {
     let parser = App::parse();
     match parser.command {
@@ -59,14 +51,3 @@ async fn main() {
         },
     }
 }
-
-// async fn get_connection<'a> (user: &'a String, password: &'a String, connection: &'a String) -> Connection {
-//     let options = ConnectionProperties::default()
-//         // Use tokio executor and reactor.
-//         // At the moment the reactor is only available for unix.
-//         .with_executor(tokio_executor_trait::Tokio::current())
-//         .with_reactor(tokio_reactor_trait::Tokio);
-
-//     Connection::connect(connection, options).await.unwrap()
-// }
-
