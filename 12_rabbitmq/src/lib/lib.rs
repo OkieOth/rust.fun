@@ -1,6 +1,10 @@
 use clap::{Args};
 
 
+mod rabbit_client;
+
+use rabbit_client::RabbitConnection;
+
 #[derive(Debug, Args)]
 pub struct PublisherArgs {
     /// Number of parallel publishings
@@ -59,12 +63,14 @@ pub struct GlobalOpts {
 }
 
 
-pub fn start_publisher(args: PublisherArgs) -> Result<(), &'static str> {
-    println!("Hello, world ... I am a Subscriber");
-    Ok(())
+pub async fn start_publisher(args: PublisherArgs) {
+    println!("Hello, world ... I am a Publisher");
+    let mut con = RabbitConnection::new();
+    con.connect().await.unwrap();
 }
 
-pub fn start_subscriber(args: SubscriberArgs) -> Result<(), &'static str> {
+pub async fn start_subscriber(args: SubscriberArgs) {
     println!("Hello, world ... I am a Subscriber");
-    Ok(())
+    let mut con = RabbitConnection::new();
+    con.connect().await.unwrap();
 }

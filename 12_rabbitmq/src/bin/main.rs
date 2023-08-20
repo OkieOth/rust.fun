@@ -1,4 +1,6 @@
 use log::{error, info, debug, LevelFilter};
+use env_logger::filter::{Builder, Filter};
+use env_logger::Env;
 
 use clap::Parser;
 
@@ -29,25 +31,27 @@ enum Command {
 }
 
 
-#[tokio::main(flavor = "multi_thread", worker_threads = 2)]
-async fn main() {
-    let parser = App::parse();
-    match parser.command {
-        Command::Subscriber(args) => {
-            match start_subscriber(args) {
-                Err(s) => {
-                    error!("Error while run subscriber: {}", s);
+fn main() {
+    let env = Env::default()
+    .filter_or("LOG_LEVEL", "info");
+
+    env_logger::init_from_env(env);
+
+
+    tokio::runtime::Builder::new_multi_thread()
+        .enable_all()
+        .build()
+        .unwrap()
+        .block_on( async {
+            let parser = App::parse();
+            match parser.command {
+                Command::Subscriber(args) => {
+                    start_subscriber(args).await;
                 },
-                _ => {}
-            }
-        },
-        Command::Publisher(args) => {
-            match start_publisher(args) {
-                Err(s) => {
-                    error!("Error while run publisher: {}", s);
+                Command::Publisher(args) => {
+                    start_publisher(args).await;
                 },
-                _ => {}
+            };
             }
-        },
-    }
+        );
 }
