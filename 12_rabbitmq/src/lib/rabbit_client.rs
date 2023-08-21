@@ -33,6 +33,11 @@ impl RabbitConnection {
             },
         }
     }
+
+    pub async fn publish(&mut self, content: Vec<u8>) -> Result<(),&'static str> {
+        Ok(())
+    }
+
 }
 
 

@@ -3,6 +3,8 @@ use clap::{Args};
 
 mod rabbit_client;
 
+mod rabbit_publisher;
+
 use rabbit_client::RabbitConnection;
 
 #[derive(Debug, Args)]
