@@ -1,11 +1,12 @@
 use clap::{Args};
+use std::thread;
+use std::time::Duration;
+use log::{error, info, debug};
 
 
 mod rabbit_client;
 
-mod rabbit_publisher;
-
-use rabbit_client::RabbitConnection;
+use rabbit_client::{RabbitClient, RabbitConParams};
 
 #[derive(Debug, Args)]
 pub struct PublisherArgs {
@@ -18,7 +19,7 @@ pub struct PublisherArgs {
     pub delay: usize,
 
     /// Number of bytes to publish
-    #[clap(long, short = 's', default_value_t = 1024)]
+    #[clap(long, short = 'z', default_value_t = 1024)]
     pub package_size: usize,
 
     #[clap(flatten)]
@@ -51,28 +52,46 @@ pub struct GlobalOpts {
     #[clap(long, short)]
     pub routing_key: String,
 
-    /// Connection string
-    #[clap(long, short, default_value = "amqp://localhost:5672")]
-    pub connection: String,
+    /// Server to connect to
+    #[clap(long, short, default_value = "localhost")]
+    pub server: String,
+
+    /// Port to connect to :5672
+    #[clap(long, short, default_value_t = 5672)]
+    pub port: u16,
 
     /// User name to authenticate
     #[clap(long, short)]
     pub user: String,
 
     /// Password to authenticate
-    #[clap(long, short)]
+    #[clap(long)]
     pub password: String,
+}
+
+fn create_con_params(args: GlobalOpts) -> RabbitConParams {
+    RabbitConParams {
+        server: args.server,
+        port: args.port,
+        user: args.user,
+        password: args.password,
+    }
 }
 
 
 pub async fn start_publisher(args: PublisherArgs) {
-    println!("Hello, world ... I am a Publisher");
-    let mut con = RabbitConnection::new();
-    con.connect().await.unwrap();
+        println!("Hello, world ... I am a Publisher");
+        let mut con = RabbitClient::new(create_con_params(args.global_opts));
+        con.connect().await.unwrap();
+        loop {
+            let duration = Duration::from_secs(2);
+            thread::sleep(duration);
+            debug!("I am sleeping for 2s");
+        }
 }
 
 pub async fn start_subscriber(args: SubscriberArgs) {
     println!("Hello, world ... I am a Subscriber");
-    let mut con = RabbitConnection::new();
+    let mut con = RabbitClient::new(create_con_params(args.global_opts));
     con.connect().await.unwrap();
 }

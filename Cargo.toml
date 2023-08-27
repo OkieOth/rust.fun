@@ -17,4 +17,6 @@ members = [
     "12_rabbitmq",
     "13_tinyhttp",
     "14_udp",
+    "15_trait_refs",
+    "16_channels",
 ]

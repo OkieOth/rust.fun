@@ -37,6 +37,8 @@ fn main() {
 
     env_logger::init_from_env(env);
 
+    println!("I am running in loglevel: {}", log::max_level());
+
 
     tokio::runtime::Builder::new_multi_thread()
         .enable_all()
