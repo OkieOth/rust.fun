@@ -1,68 +1,10 @@
 @startuml
 
 
-class RabbitConnection {
-    callbacks: RabbitConnectionUser[]
-
-    registerUser()
-    unregisterUser()
-}
-
-interface RabbitConnectionUser {
-    connectionClosed()
-    connectionEstablished()
-}
-
-class RabbitChannel {
-    callbacks: RabbitChannelCallbacks[]
-
-    registerCallback()
-    unregisterCallback()
-}
-
-class RabbitPublisher {
-    connection: &RabbitConnection
-    channel: RabbitChannel
-    params: RabbitPublisherParams
-
-    publish()
-    publish_to()
-}
-
-class RabbitSubscriber
-
-class RabbitSubscription {
-    params: RabbitSubscriberParams
-    callback: RabbitSucscriber
-
-    init()
-}
+rectangle Connection
+rectangle RabbitClient
 
 
-class RabbitSubscriber {
-    connection: & RabbitConnection
-    channel: RabbitChannel
 
-    subscriptions: RabbitSubscription[]
-
-    subscribe(params: RabbitSubscriberParams, callback: RabbitSucscriber) -> usize
-}
-
-class RabbitSubscriberParams {
-
-}
-
-class RabbitPublisherParams {
-
-}
-
-RabbitSubscriber *- RabbitSubscription
-RabbitSubscription *-d- RabbitSubscriberParams
-RabbitSubscriber o-u- RabbitConnection
-RabbitSubscriber *-u- RabbitChannel
-
-RabbitPublisher *-d- RabbitPublisherParams
-RabbitPublisher o-u- RabbitConnection
-RabbitPublisher *-u- RabbitChannel
 
 @enduml

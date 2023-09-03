@@ -1,12 +1,15 @@
 use clap::{Args};
+use tokio::sync::mpsc::{Sender, Receiver};
+use tokio::sync::mpsc;
 use std::thread;
 use std::time::Duration;
+use std::time;
 use log::{error, info, debug};
 
 
-mod rabbit_client;
+mod easy_client;
 
-use rabbit_client::{RabbitClient, RabbitConParams};
+use easy_client::{RabbitClient, RabbitConParams};
 
 #[derive(Debug, Args)]
 pub struct PublisherArgs {
@@ -24,7 +27,6 @@ pub struct PublisherArgs {
 
     #[clap(flatten)]
     pub global_opts: GlobalOpts,
-
 }
 
 #[derive(Debug, Args)]
@@ -81,17 +83,85 @@ fn create_con_params(args: GlobalOpts) -> RabbitConParams {
 
 pub async fn start_publisher(args: PublisherArgs) {
         println!("Hello, world ... I am a Publisher");
-        let mut con = RabbitClient::new(create_con_params(args.global_opts));
+
+        // is used to inform the user of the client, that something went so wrong in the client, that it couldn't be handled internally
+        let (tx_panic, mut rx_panic): (Sender<String>, Receiver<String>) = mpsc::channel(1);
+        let mut con = RabbitClient::new(create_con_params(args.global_opts), tx_panic.clone(), 4);
         con.connect().await.unwrap();
-        loop {
-            let duration = Duration::from_secs(2);
-            thread::sleep(duration);
-            debug!("I am sleeping for 2s");
+        // let publisher = con.get_publisher(1).await.unwrap();
+        // publisher.open_channel().await.unwrap();
+        // let publisher2 = con.get_publisher(2).await.unwrap();
+        // publisher2.open_channel().await.unwrap();
+        // let publisher3 = con.get_publisher(3).await.unwrap();
+        // publisher3.open_channel().await.unwrap();
+        // let publisher4 = con.get_publisher(4).await.unwrap();
+        // publisher4.open_channel().await.unwrap();
+        // let publisher5 = con.get_publisher(5).await.unwrap();
+        // publisher5.open_channel().await.unwrap();
+        // let publisher6 = con.get_publisher(6).await.unwrap();
+        // publisher6.open_channel().await.unwrap();
+
+        for id in 0..1 {
+            let publisher = con.get_publisher(id).await.unwrap();
+            tokio::spawn(async move {
+                info!("thread-{} is started", id);
+                let sleep_time = time::Duration::from_secs(3);
+                match publisher.open_channel().await {
+                    Ok(()) => {
+                        debug!("channel-{} successfully opened", id);
+                    },
+                    Err(_) => {
+                        error!("channel-{} could not be opened, cancel", id);
+                    }
+                }
+                loop {
+                    publisher.say_hello();
+                    thread::sleep(sleep_time);
+                }
+            });
         }
+
+
+        // for id in 0..50 {
+        //     let publisher = con.get_publisher().await;
+        //     tokio::spawn(async move {
+        //         info!("thread-{} is started", id);    
+        //         let sleep_time = time::Duration::from_secs(1);
+        //         let s = "hallo :)".to_string();
+        //         let mut i  = 0;
+
+        //         loop { 
+        //             i += 1;
+        //                 info!("thread-{} is publishing ...", id);    
+        //                 match publisher.publish("test-exchange".to_string(), "test".to_string(), s.as_bytes().to_vec()).await {
+        //                     Ok(()) => {
+        //                         debug!("thread-{} published successfully", id);
+        //                     },
+        //                     Err(e) => {
+        //                         error!("error while publishing: {}", e.to_string());
+        //                     }
+        //                 }
+        //             if (i==10) {
+        //                 break;
+        //             }
+        //             info!("thread-{} is going to sleep ({}) ...", id, i);
+        //             thread::sleep(sleep_time);
+        //         }
+        //         info!("thread-{} ended", id);
+        //     });
+        // }
+    
+        debug!("I am running until I receive a panic request ... or get killed");
+        if let Some(msg) = rx_panic.recv().await {
+            error!("receive panic msg: {}", msg);
+        }
+        info!("close program");
 }
 
 pub async fn start_subscriber(args: SubscriberArgs) {
     println!("Hello, world ... I am a Subscriber");
-    let mut con = RabbitClient::new(create_con_params(args.global_opts));
+    // is used to inform the user of the client, that something went so wrong in the client, that it couldn't be handled internally
+    let (tx_panic, rx_panic): (Sender<String>, Receiver<String>) = mpsc::channel(1);
+    let mut con = RabbitClient::new(create_con_params(args.global_opts), tx_panic.clone(), 10);
     con.connect().await.unwrap();
 }

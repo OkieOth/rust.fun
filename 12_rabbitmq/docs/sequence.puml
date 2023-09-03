@@ -1,0 +1,15 @@
+@startuml
+participant RabbitMq
+participant Amqprs
+participant Connection
+participant Channel_1
+participant Channel_2
+participant Channel_3
+participant Channel_4
+
+Amqprs <- Connection: connect
+Amqprs -> RabbitMq
+Amqprs --> Connection: success
+== Disconnect ... ==
+
+@enduml
